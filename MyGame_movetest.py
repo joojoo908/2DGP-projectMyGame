@@ -7,17 +7,23 @@ class player:
     def __init__(self):
         self.x,self.y = 500,500
         self.framex = 0
-        self.framey = 11
+        self.framey = 10
         self.image = load_image('red_hood.png')
 
     def update(self):
         self.framex = (self.framex+1)%12
-        if self.framex==1:
+        if self.framex==0:
             self.framey = (self.framey-1)%11
+            if self.framey==8:
+                self.framey=10
+                self.framex=1
         #self.x+=5
     def draw(self):
         size = 112
-        self.image.clip_composite_draw(self.framex*size, self.framey*133 ,size,133 ,0,'i',self.x,self.y,300,300)
+        #좌측
+        #self.image.clip_composite_draw(self.framex*size, self.framey*133 ,size,133 ,0,'i',self.x,self.y,300,300)
+        #우측
+        self.image.clip_composite_draw(self.framex*size, self.framey*133 ,size,133 ,0,'h',self.x,self.y,300,300)
         #self.image.clip_draw(self.frame*120 , 0, 120,300 , self.x,self.y)
 
 def handle_events():
