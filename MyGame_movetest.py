@@ -3,7 +3,7 @@ from pico2d import *
 import math
 import random
 
-WIDTH, HEIGHT = 1280 , 1024
+WIDTH, HEIGHT = 1400 , 1000
 click =False;
 x,y =0,0
 
@@ -56,6 +56,17 @@ class player:
         #self.image.clip_composite_draw(self.framex*size, self.framey*133 ,size,133 ,0,'h',self.x,self.y,300,300)
         #self.image.clip_draw(self.frame*120 , 0, 120,300 , self.x,self.y)
 
+class Ground:
+    def __init__(self,x,y):
+        self.x,self.y = x,y
+        self.image = load_image('Ground.png')
+    def update(self):
+        pass
+    def draw(self):
+         #self.image.draw(self.x,self.y)
+        self.image.clip_composite_draw(0*176 , 2*80, 176 ,80 ,0,'i',self.x,self.y,200,200)
+         #self.image.clip_draw(0*176//2 , 0*80, 176//4 ,80 , self.x,self.y)
+
 def handle_events():
     global move
     global key
@@ -93,8 +104,6 @@ def handle_events():
                 up=0
             if event.key==SDLK_DOWN:
                 down =0
-            if up==0 and down==0 and r==0 and l==0:
-                key=0;
 
 def reset_world():
     global key
@@ -102,6 +111,9 @@ def reset_world():
 
     key=True
     world=[]
+
+    ground =Ground(500,500)
+    #world.append(ground)
 
     p1 = player()
     world.append(p1)
