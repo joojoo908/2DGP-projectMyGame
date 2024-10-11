@@ -6,10 +6,19 @@ import random
 WIDTH, HEIGHT = 1400 , 1000
 click =False;
 x,y =0,0
+mx,my = 0,0
+viewX ,viewY =0,0
+
+def len(x1,y1,x2,y2):
+    return math.sqrt((x2-x1)**2 + (y2-y1)**2)
+def angle(x1,y1,x2,y2):
+    return math.atan2((y2-y1),(x2-x1))
 
 class player:
+    global viewX ,viewY
     global click
     global x,y
+    global mx,my
     def __init__(self):
         self.x,self.y = 500,500
         self.framex = 0
@@ -21,41 +30,42 @@ class player:
 
     def update(self):
         #------애니메이션---
-        if self.state==0:
+        if self.state==0: #idle
             self.framex = (self.framex+1)%18
-        elif self.state==1:
+        elif self.state==1: #move
             self.framex = (self.framex+1)%12
             if self.framex==0:
                 self.framey = (self.framey-1)%11
                 if self.framey==8:
                     self.framey=10
                     self.framex=1
-        if click:
+        #----이동---
+        speed = 10
+        if len(self.x,self.y,mx,my) > speed:
             self.state=1
+            self.dire = mx <= self.x
+            self.x += speed*math.cos(angle(self.x,self.y,mx,my))
+            self.y += speed*math.sin(angle(self.x,self.y,mx,my))
         else:
             self.state=0
-        if x>=self.x:
-            self.dire=0
-        else:
-            self.dire=1;
-        #self.x+=5
+        
     def draw(self):
         size = 112
         #좌측
         if self.state==0:
             if self.dire == 0:
-                self.idle.clip_composite_draw(self.framex*80, 0 ,80,80 ,0,'i',self.x+15,self.y-15,140,140)
+                self.idle.clip_composite_draw(self.framex*80, 0 ,80,80 ,0,'i', self.x+15, self.y-15 ,140,140)
             else:
-                self.idle.clip_composite_draw(self.framex*80, 0 ,80,80 ,0,'h',self.x-15,self.y-15,140,140)
+                self.idle.clip_composite_draw(self.framex*80, 0 ,80,80 ,0,'h', self.x-15, self.y-15 ,140,140)
         elif self.state==1:
             if self.dire == 0:
-                self.image.clip_composite_draw(self.framex*size, self.framey*133 ,size,133 ,0,'h',self.x,self.y,200,200)
+                self.image.clip_composite_draw(self.framex*size, self.framey*133 ,size,133
+                                               ,0,'h',self.x,self.y,200,200)
             else:
-                self.image.clip_composite_draw(self.framex*size, self.framey*133 ,size,133 ,0,'i',self.x,self.y,200,200)
-        #우측
-        #self.image.clip_composite_draw(self.framex*size, self.framey*133 ,size,133 ,0,'h',self.x,self.y,300,300)
-        #self.image.clip_draw(self.frame*120 , 0, 120,300 , self.x,self.y)
+                self.image.clip_composite_draw(self.framex*size, self.framey*133 ,size,133
+                                               ,0,'i',self.x,self.y,200,200)
 
+                
 class Ground:
     def __init__(self,x,y):
         self.x,self.y = x,y
@@ -73,6 +83,7 @@ def handle_events():
     global up, down , r ,l
     global x,y
     global click
+    global mx,my
     events = get_events()
 
     for event in events:
@@ -81,8 +92,9 @@ def handle_events():
         elif event.type == SDL_MOUSEMOTION:
             x,y = event.x , HEIGHT -1 -event.y
         elif event.type == SDL_MOUSEBUTTONDOWN:
-            click = not click;
-            print(x,y)
+            if event.button == SDL_BUTTON_LEFT:
+                mx ,my = x,y
+            
         elif event.type == SDL_KEYDOWN:
             key =True
             if event.key==SDLK_RIGHT:
