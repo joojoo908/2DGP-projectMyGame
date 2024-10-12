@@ -70,23 +70,27 @@ def handle_events():
         
         if event.type == SDL_KEYDOWN and event.key==SDLK_p:
             print(", ".join(f"({o.x}, {o.y}, {o.tiletype}, {o.tilenum})" for o in world))
-        if event.type == SDL_KEYDOWN and event.key==SDLK_c:
+        elif event.type == SDL_KEYDOWN and event.key==SDLK_c:
             print('tiletype: ',tt,'tilenum: ', tn)
+            
         if event.type == SDL_KEYDOWN and event.key==SDLK_1:
             tt=(tt+1)%3
-        if event.type == SDL_KEYDOWN and event.key==SDLK_2:
+        elif event.type == SDL_KEYDOWN and event.key==SDLK_2:
             tn=(tn+1)%55
-        if event.type == SDL_KEYDOWN and event.key==SDLK_3:
+        elif event.type == SDL_KEYDOWN and event.key==SDLK_3:
             tn=(tn+11)%55
-        if event.type == SDL_KEYDOWN and event.key==SDLK_5:
+        elif event.type == SDL_KEYDOWN and event.key==SDLK_5:
             tn=(tn-1)%55
-        if event.type == SDL_KEYDOWN and event.key==SDLK_6:
+        elif event.type == SDL_KEYDOWN and event.key==SDLK_6:
             tn=(tn-11)%55
             
         if event.type == SDL_MOUSEMOTION:
             x,y = event.x , HEIGHT -1 -event.y
         elif event.type == SDL_MOUSEBUTTONDOWN:
-            #print(x,y)
+            click =True
+        elif event.type == SDL_MOUSEBUTTONUP:
+            click =False
+        if click:
             ground = get_ground(x, y)
             if ground:
                 # 이미 존재하는 타일이 있을 경우, 타일의 타입과 번호 변경
@@ -97,10 +101,6 @@ def handle_events():
                 ground = Ground((x+viewX) - (x+viewX)%tilesize - WIDTH//2,
                                 (y+viewY)-(y+viewY) %tilesize - HEIGHT//2, tt, tn)
                 world.append(ground)
-            
-            #ground =Ground((x+viewX) - (x+viewX)%50 - WIDTH//2 ,(y+viewY)-(y+viewY) %tilesize - HEIGHT//2, tt,tn)
-            #world.append(ground)
-
             
 def reset_world():
     global key
