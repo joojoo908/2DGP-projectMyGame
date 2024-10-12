@@ -79,9 +79,11 @@ def handle_events():
 def reset_world():
     global key
     global world
+    global choiceground
 
     key=True
     #world=[]
+    choiceground = Ground(viewX+650,viewY+450,tt,tn)
 
     ground =Ground(0,0,0,0)
     world.append(ground)
@@ -94,11 +96,14 @@ def reset_world():
 def update_world():
     for o in world:
         o.update()
+    choiceground.x ,choiceground.y =viewX+650 ,viewY+450
+    choiceground.tiletype , choiceground.tilenum = tt ,tn
         
 def render_world():
     clear_canvas()
     for o in world:
         o.draw()
+    choiceground.draw()
     update_canvas()
 
 
