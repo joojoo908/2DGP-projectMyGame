@@ -6,6 +6,8 @@ WIDTH, HEIGHT = 1400 , 1000
 click =False;
 x,y =0,0
 viewX , viewY = 0,0
+tiles =[(0,0,0,0),(50,0,1,0),(100,-50,0,10),(150,-50,0,10),(50,-50,0,10),(0,-50,0,10),(100,0,0,10),(100,50,0,10),(50,50,0,10),(0,50,0,10),(-50,50,0,10)
+        ,(-50,0,0,10),(-50,-50,0,10)]
 world = []
 tt ,tn = 0,0
 
@@ -67,7 +69,11 @@ def handle_events():
         if event.type == SDL_KEYDOWN and event.key==SDLK_2:
             tn=(tn+1)%55
         if event.type == SDL_KEYDOWN and event.key==SDLK_3:
+            tn=(tn-1)%55
+        if event.type == SDL_KEYDOWN and event.key==SDLK_3:
             tn=(tn+11)%55
+        if event.type == SDL_KEYDOWN and event.key==SDLK_4:
+            tn=(tn-11)%55
             
         if event.type == SDL_MOUSEMOTION:
             x,y = event.x , HEIGHT -1 -event.y
@@ -75,6 +81,7 @@ def handle_events():
             print(x,y)
             ground =Ground((x+viewX) - (x+viewX)%50 - WIDTH//2 ,(y+viewY)-(y+viewY) %50 - HEIGHT//2, tt,tn)
             world.append(ground)
+
             
 def reset_world():
     global key
@@ -85,10 +92,14 @@ def reset_world():
     #world=[]
     choiceground = Ground(viewX+650,viewY+450,tt,tn)
 
-    ground =Ground(0,0,0,0)
-    world.append(ground)
-    ground =Ground(50,0,1,0)
-    world.append(ground)
+    for tile in tiles:
+        ground = Ground(*tile)  # unpacking하여 인자로 전달
+        world.append(ground)
+
+    #ground =Ground(0,0,0,0)
+    #world.append(ground)
+    #ground =Ground(50,0,1,0)
+    #world.append(ground)
 
     #p1 = player()
     #world.append(p1)
@@ -116,6 +127,6 @@ while key:
     update_world()
     render_world()
     #print (viewX,viewY)
-    delay(0.01)
+    delay(0.1)
 
 close_canvas()
