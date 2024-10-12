@@ -6,7 +6,9 @@ WIDTH, HEIGHT = 1400 , 1000
 click =False;
 x,y =0,0
 viewX , viewY = 0,0
-world =[]
+world = []
+tt ,tn = 0,0
+
 
 class Ground:
     global viewX , viewY
@@ -17,19 +19,22 @@ class Ground:
         self.tilenum=tilenum
         self.image = load_image('Ground.png')
         self.water = load_image('Water.png')
+        self.cliff = load_image('Cliff.png')
     def update(self):
         self.frame = (self.frame+1)%8
         pass
     def draw(self):
          #self.image.draw(self.x,self.y)
         if self.tiletype==0:
-            self.image.clip_composite_draw(0*176 +1*16 , 2*80 +3*16, 16 + 0*176 , 16+ 0*80
+            self.image.clip_composite_draw(0*176 + (self.tilenum%11)*16 , 2*80 + (4 - self.tilenum//11) *16, 16 + 0*176 , 16+ 0*80
                                            ,0,'i',WIDTH//2-viewX+ self.x+25 ,HEIGHT//2 -viewY + self.y+25 ,50,50)
         elif self.tiletype==1:
-            self.water.clip_composite_draw(self.frame*176 +1*16 , 1*80 +3*16, 16 + 0*176 , 16+ 0*80 ,
+            self.water.clip_composite_draw(self.frame*176 +(self.tilenum%11)*16 , 1*80 +(4 - self.tilenum//11)*16 , 16 + 0*176 , 16+ 0*80 ,
                                            0,'i', WIDTH//2-viewX+ self.x+25 ,HEIGHT//2 -viewY + self.y+25,50,50)
+        elif self.tiletype==2:
+            pass
     def printself(self):
-        print( '(',self.x,',',self.y, ',',self.tiletype, ',', self.tilenum, '),')
+        print( '(',self.x,',',self.y, ',',self.tiletype, ',', self.tilenum, '),' ,sep='', end='')
 
 def handle_events():
     global move
@@ -37,30 +42,39 @@ def handle_events():
     global x,y
     global click
     global viewX,viewY
+    global tt,tn
     events = get_events()
-
     for event in events:
         if event.type == SDL_QUIT:
             key = 0
-        elif event.type == SDL_MOUSEMOTION:
-            move=10;
-            x,y = event.x , HEIGHT -1 -event.y
-            if x<200:
-                viewX-=move
-            elif x>1200:
-                viewX+=move
-            if y<200:
-                viewY-=move
-            elif y>800:
-                viewY+=move
-            
-        elif event.type == SDL_MOUSEBUTTONDOWN:
-            print(x,y)
-            ground =Ground((x+viewX) - (x+viewX)%50 - WIDTH//2 ,(y+viewY)-(y+viewY) %50 - HEIGHT//2,0,0)
-            world.append(ground)
-        elif event.type == SDL_KEYDOWN and event.key==SDLK_c:
+        move=50;
+        if event.type == SDL_KEYDOWN and event.key==SDLK_a:
+            viewX-=move
+        elif event.type == SDL_KEYDOWN and event.key==SDLK_d:
+            viewX+=move
+        if event.type == SDL_KEYDOWN and event.key==SDLK_s:
+            viewY-=move
+        elif event.type == SDL_KEYDOWN and event.key==SDLK_w:
+            viewY+=move
+        
+        if event.type == SDL_KEYDOWN and event.key==SDLK_p:
             for o in world:
                 o.printself()
+        if event.type == SDL_KEYDOWN and event.key==SDLK_c:
+            print('tiletype: ',tt,'tilenum: ', tn)
+        if event.type == SDL_KEYDOWN and event.key==SDLK_1:
+            tt=(tt+1)%3
+        if event.type == SDL_KEYDOWN and event.key==SDLK_2:
+            tn=(tn+1)%55
+        if event.type == SDL_KEYDOWN and event.key==SDLK_3:
+            tn=(tn+11)%55
+            
+        if event.type == SDL_MOUSEMOTION:
+            x,y = event.x , HEIGHT -1 -event.y
+        elif event.type == SDL_MOUSEBUTTONDOWN:
+            print(x,y)
+            ground =Ground((x+viewX) - (x+viewX)%50 - WIDTH//2 ,(y+viewY)-(y+viewY) %50 - HEIGHT//2, tt,tn)
+            world.append(ground)
             
 def reset_world():
     global key
