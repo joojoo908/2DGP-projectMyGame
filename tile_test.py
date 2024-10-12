@@ -6,8 +6,10 @@ WIDTH, HEIGHT = 1400 , 1000
 click =False;
 x,y =0,0
 viewX , viewY = 0,0
-tiles =[(0,0,0,0),(50,0,1,0),(100,-50,0,10),(150,-50,0,10),(50,-50,0,10),(0,-50,0,10),(100,0,0,10),(100,50,0,10),(50,50,0,10),(0,50,0,10),(-50,50,0,10)
-        ,(-50,0,0,10),(-50,-50,0,10)]
+tilesize = 50
+tiles =[(0,0,0,0),(50,0,1,0),(100,-50,1,12),(150,-50,1,12),(50,-50,0,10),(0,-50,0,10),(100,0,1,1),(100,50,0,10),(50,50,0,10),(0,50,0,10),(-50,50,0,10),
+        (-50,0,0,10),(-50,-50,0,10),(150,0,1,1),(200,0,1,1),(250,0,1,2),(250,-50,1,13),(250,-100,1,13),(200,-50,1,12),(100,-100,1,12),(150,-100,1,12),
+        (200,-100,1,12),(100,-150,1,12),(150,-150,1,12),(200,-150,1,12)]
 world = []
 tt ,tn = 0,0
 
@@ -38,6 +40,13 @@ class Ground:
     def printself(self):
         print( '(',self.x,',',self.y, ',',self.tiletype, ',', self.tilenum, '),' ,sep='', end='')
 
+def get_ground(x, y):
+    # 클릭한 위치에 이미 Ground가 있는지 확인하고 해당 Ground를 반환
+    for ground in world:
+        if (ground.x == (x+viewX)-(x+viewX)%tilesize - WIDTH//2 and
+                ground.y == (y+viewY)-(y+viewY)%tilesize - HEIGHT//2):
+            return ground
+    
 def handle_events():
     global move
     global key
@@ -60,8 +69,7 @@ def handle_events():
             viewY+=move
         
         if event.type == SDL_KEYDOWN and event.key==SDLK_p:
-            for o in world:
-                o.printself()
+            print(", ".join(f"({o.x}, {o.y}, {o.tiletype}, {o.tilenum})" for o in world))
         if event.type == SDL_KEYDOWN and event.key==SDLK_c:
             print('tiletype: ',tt,'tilenum: ', tn)
         if event.type == SDL_KEYDOWN and event.key==SDLK_1:
@@ -69,18 +77,29 @@ def handle_events():
         if event.type == SDL_KEYDOWN and event.key==SDLK_2:
             tn=(tn+1)%55
         if event.type == SDL_KEYDOWN and event.key==SDLK_3:
-            tn=(tn-1)%55
-        if event.type == SDL_KEYDOWN and event.key==SDLK_3:
             tn=(tn+11)%55
-        if event.type == SDL_KEYDOWN and event.key==SDLK_4:
+        if event.type == SDL_KEYDOWN and event.key==SDLK_5:
+            tn=(tn-1)%55
+        if event.type == SDL_KEYDOWN and event.key==SDLK_6:
             tn=(tn-11)%55
             
         if event.type == SDL_MOUSEMOTION:
             x,y = event.x , HEIGHT -1 -event.y
         elif event.type == SDL_MOUSEBUTTONDOWN:
-            print(x,y)
-            ground =Ground((x+viewX) - (x+viewX)%50 - WIDTH//2 ,(y+viewY)-(y+viewY) %50 - HEIGHT//2, tt,tn)
-            world.append(ground)
+            #print(x,y)
+            ground = get_ground(x, y)
+            if ground:
+                # 이미 존재하는 타일이 있을 경우, 타일의 타입과 번호 변경
+                ground.tiletype = tt
+                ground.tilenum = tn
+            else:
+                # 타일이 없을 경우, 새로운 타일 생성
+                ground = Ground((x+viewX) - (x+viewX)%tilesize - WIDTH//2,
+                                (y+viewY)-(y+viewY) %tilesize - HEIGHT//2, tt, tn)
+                world.append(ground)
+            
+            #ground =Ground((x+viewX) - (x+viewX)%50 - WIDTH//2 ,(y+viewY)-(y+viewY) %tilesize - HEIGHT//2, tt,tn)
+            #world.append(ground)
 
             
 def reset_world():
