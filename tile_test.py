@@ -7,12 +7,24 @@ click =False;
 x,y =0,0
 viewX , viewY = 0,0
 tilesize = 50
-tiles =[(0,0,0,0),(50,0,1,0),(100,-50,1,12),(150,-50,1,12),(50,-50,0,10),(0,-50,0,10),(100,0,1,1),(100,50,0,10),(50,50,0,10),(0,50,0,10),(-50,50,0,10),
-        (-50,0,0,10),(-50,-50,0,10),(150,0,1,1),(200,0,1,1),(250,0,1,2),(250,-50,1,13),(250,-100,1,13),(200,-50,1,12),(100,-100,1,12),(150,-100,1,12),
-        (200,-100,1,12),(100,-150,1,12),(150,-150,1,12),(200,-150,1,12)]
+file_map = 'tiles.txt'
+tiles = []
 world = []
 tt ,tn = 0,0
 
+def save_tiles(filename, tiles):
+    with open(filename, 'w') as f:
+        for tile in tiles:
+            f.write(f"{tile}\n")
+
+# tiles 불러오기 함수
+def load_tiles(filename):
+    tiles = []
+    with open(filename, 'r') as f:
+        for line in f:
+            tile = eval(line.strip())
+            tiles.append(tile)
+    return tiles
 
 class Ground:
     global viewX , viewY
@@ -34,9 +46,10 @@ class Ground:
                                            ,0,'i',WIDTH//2-viewX+ self.x+25 ,HEIGHT//2 -viewY + self.y+25 ,50,50)
         elif self.tiletype==1:
             self.water.clip_composite_draw(self.frame*176 +(self.tilenum%11)*16 , 1*80 +(4 - self.tilenum//11)*16 , 16 + 0*176 , 16+ 0*80 ,
-                                           0,'i', WIDTH//2-viewX+ self.x+25 ,HEIGHT//2 -viewY + self.y+25,50,50)
+                                           0,'i', WIDTH//2-viewX+ self.x+25 ,HEIGHT//2 -viewY + self.y+25, 50,50)
         elif self.tiletype==2:
-            pass
+            self.cliff.clip_composite_draw(0*112 + (self.tilenum%7)*16 , 0*80 +(7 - self.tilenum//7)*16 , 16 + 0*176 , 16+ 0*80 ,
+                                           0,'i', WIDTH//2-viewX+ self.x+25 ,HEIGHT//2 -viewY + self.y+25, 50,50)
     def printself(self):
         print( '(',self.x,',',self.y, ',',self.tiletype, ',', self.tilenum, '),' ,sep='', end='')
 
@@ -69,7 +82,7 @@ def handle_events():
             viewY+=move
         
         if event.type == SDL_KEYDOWN and event.key==SDLK_p:
-            print(", ".join(f"({o.x}, {o.y}, {o.tiletype}, {o.tilenum})" for o in world))
+            print(", ".join(f"{o.x}, {o.y}, {o.tiletype}, {o.tilenum}" for o in world))
         elif event.type == SDL_KEYDOWN and event.key==SDLK_c:
             print('tiletype: ',tt,'tilenum: ', tn)
             
@@ -101,11 +114,17 @@ def handle_events():
                 ground = Ground((x+viewX) - (x+viewX)%tilesize - WIDTH//2,
                                 (y+viewY)-(y+viewY) %tilesize - HEIGHT//2, tt, tn)
                 world.append(ground)
-            
+
+#save_tiles(file_map, tiles)
+# 파일에서 tiles 불러오기
+tiles = load_tiles(file_map)
+
 def reset_world():
     global key
     global world
     global choiceground
+    global tiles
+    
 
     key=True
     #world=[]
@@ -114,14 +133,6 @@ def reset_world():
     for tile in tiles:
         ground = Ground(*tile)  # unpacking하여 인자로 전달
         world.append(ground)
-
-    #ground =Ground(0,0,0,0)
-    #world.append(ground)
-    #ground =Ground(50,0,1,0)
-    #world.append(ground)
-
-    #p1 = player()
-    #world.append(p1)
     
 def update_world():
     for o in world:
@@ -149,3 +160,5 @@ while key:
     delay(0.1)
 
 close_canvas()
+save_tiles(file_map, tiles)
+
