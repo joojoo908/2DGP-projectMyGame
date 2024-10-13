@@ -100,17 +100,17 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key==SDLK_c:
             print('tiletype: ',tt,'tilenum: ', tn)
             
-        if event.type == SDL_KEYDOWN and event.key==SDLK_1:
+        if event.type == SDL_KEYDOWN and event.key==SDLK_2:
             tt=(tt+1)
-        elif event.type == SDL_KEYDOWN and event.key==SDLK_2:
+        elif event.type == SDL_KEYDOWN and event.key==SDLK_1:
             tt=(tt-1)
-        elif event.type == SDL_KEYDOWN and event.key==SDLK_3:
-            tn=(tn+1)%55
-        elif event.type == SDL_KEYDOWN and event.key==SDLK_5:
-            tn=(tn+5)%55
         elif event.type == SDL_KEYDOWN and event.key==SDLK_4:
-            tn=(tn-1)%55
+            tn=(tn+1)%55
         elif event.type == SDL_KEYDOWN and event.key==SDLK_6:
+            tn=(tn+5)%55
+        elif event.type == SDL_KEYDOWN and event.key==SDLK_3:
+            tn=(tn-1)%55
+        elif event.type == SDL_KEYDOWN and event.key==SDLK_5:
             tn=(tn-5)%55
             
         if event.type == SDL_MOUSEMOTION:
@@ -152,7 +152,7 @@ def reset_world():
 
     for tile in tiles:
         ground = Ground(*tile)  # unpacking하여 인자로 전달
-        world.append(ground)
+        world.append(ground)    
     
 def update_world():
     for o in world:

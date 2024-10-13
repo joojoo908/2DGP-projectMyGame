@@ -65,7 +65,7 @@ class player:
                     viewX += speed*math.cos(angle(self.x,self.y,mx,my))
                     
             if math.sin(angle(self.x,self.y,mx,my))<0 :
-                if self.y <= viewY -300:
+                if self.y <= viewY -200:
                     viewY += speed*math.sin(angle(self.x,self.y,mx,my))
             elif math.sin(angle(self.x,self.y,mx,my))>0 :
                 if self.y >= viewY +300:
@@ -81,7 +81,7 @@ class player:
         
     def draw(self):
         size = 112
-        playersize=1.5
+        playersize=1.8
         #좌측
         if self.state==0:
             if self.dire == 0:
