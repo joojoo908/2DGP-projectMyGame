@@ -6,16 +6,16 @@ WIDTH, HEIGHT = 1400 , 1000
 click =False;
 x,y =0,0
 viewX , viewY = 0,0
-tilesize = 50
+tilesize = 100
 file_map = 'tiles.txt'
 tiles = []
 world = []
 tt ,tn = 0,0
 
-def save_tiles(filename, tiles):
+def save_tiles(filename, world):
     with open(filename, 'w') as f:
-        for tile in tiles:
-            f.write(f"{tile}\n")
+        for ground in world:
+            f.write(f"({ground.x}, {ground.y}, {ground.tiletype}, {ground.tilenum})\n")
 
 # tiles 불러오기 함수
 def load_tiles(filename):
@@ -43,15 +43,24 @@ class Ground:
          #self.image.draw(self.x,self.y)
         if self.tiletype==0:
             self.image.clip_composite_draw(0*176 + (self.tilenum%11)*16 , 2*80 + (4 - self.tilenum//11) *16, 16 + 0*176 , 16+ 0*80
-                                           ,0,'i',WIDTH//2-viewX+ self.x+25 ,HEIGHT//2 -viewY + self.y+25 ,50,50)
+                                           ,0,'i',WIDTH//2-viewX+ self.x+tilesize//2 ,HEIGHT//2 -viewY + self.y +tilesize//2 ,
+                                           tilesize,tilesize)
         elif self.tiletype==1:
             self.water.clip_composite_draw(self.frame*176 +(self.tilenum%11)*16 , 1*80 +(4 - self.tilenum//11)*16 , 16 + 0*176 , 16+ 0*80 ,
-                                           0,'i', WIDTH//2-viewX+ self.x+25 ,HEIGHT//2 -viewY + self.y+25, 50,50)
+                                           0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
         elif self.tiletype==2:
             self.cliff.clip_composite_draw(0*112 + (self.tilenum%7)*16 , 0*80 +(7 - self.tilenum//7)*16 , 16 + 0*176 , 16+ 0*80 ,
-                                           0,'i', WIDTH//2-viewX+ self.x+25 ,HEIGHT//2 -viewY + self.y+25, 50,50)
-    def printself(self):
-        print( '(',self.x,',',self.y, ',',self.tiletype, ',', self.tilenum, '),' ,sep='', end='')
+                                           0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
+        elif self.tiletype==3:
+            self.image.clip_composite_draw(0*176 + (self.tilenum%11)*16 , 0*80 + (4 - self.tilenum//11) *16, 16 + 0*176 , 16+ 0*80
+                                           ,0,'i',WIDTH//2-viewX+ self.x+tilesize//2 ,HEIGHT//2 -viewY + self.y +tilesize//2 ,
+                                           tilesize,tilesize)
+    def drawback(self):
+        
+        self.image.clip_composite_draw(0*176 + (12%11)*16 , 2*80 + (4 - 12//11) *16, 16 + 0*176 , 16+ 0*80
+                                           ,0,'i',WIDTH//2, HEIGHT//2,
+                                           WIDTH,HEIGHT)
+    
 
 def get_ground(x, y):
     # 클릭한 위치에 이미 Ground가 있는지 확인하고 해당 Ground를 반환
@@ -67,11 +76,12 @@ def handle_events():
     global click
     global viewX,viewY
     global tt,tn
+    global file_map ,tiles
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
             key = 0
-        move=50;
+        move=tilesize;
         if event.type == SDL_KEYDOWN and event.key==SDLK_a:
             viewX-=move
         elif event.type == SDL_KEYDOWN and event.key==SDLK_d:
@@ -80,6 +90,10 @@ def handle_events():
             viewY-=move
         elif event.type == SDL_KEYDOWN and event.key==SDLK_w:
             viewY+=move
+        #타일맵 저
+        #if event.type == SDL_KEYDOWN and event.key==SDLK_t:
+            #print('save')
+            #save_tiles(file_map, tiles)
         
         if event.type == SDL_KEYDOWN and event.key==SDLK_p:
             print(", ".join(f"{o.x}, {o.y}, {o.tiletype}, {o.tilenum}" for o in world))
@@ -87,15 +101,17 @@ def handle_events():
             print('tiletype: ',tt,'tilenum: ', tn)
             
         if event.type == SDL_KEYDOWN and event.key==SDLK_1:
-            tt=(tt+1)%3
+            tt=(tt+1)
         elif event.type == SDL_KEYDOWN and event.key==SDLK_2:
-            tn=(tn+1)%55
+            tt=(tt-1)
         elif event.type == SDL_KEYDOWN and event.key==SDLK_3:
-            tn=(tn+11)%55
+            tn=(tn+1)%55
         elif event.type == SDL_KEYDOWN and event.key==SDLK_5:
+            tn=(tn+5)%55
+        elif event.type == SDL_KEYDOWN and event.key==SDLK_4:
             tn=(tn-1)%55
         elif event.type == SDL_KEYDOWN and event.key==SDLK_6:
-            tn=(tn-11)%55
+            tn=(tn-5)%55
             
         if event.type == SDL_MOUSEMOTION:
             x,y = event.x , HEIGHT -1 -event.y
@@ -124,11 +140,15 @@ def reset_world():
     global world
     global choiceground
     global tiles
+    global background
+
     
 
     key=True
     #world=[]
-    choiceground = Ground(viewX+650,viewY+450,tt,tn)
+    background = Ground(0,0,0,0)
+    
+    choiceground = Ground(viewX+600-50,viewY+400-50,tt,tn)
 
     for tile in tiles:
         ground = Ground(*tile)  # unpacking하여 인자로 전달
@@ -137,11 +157,12 @@ def reset_world():
 def update_world():
     for o in world:
         o.update()
-    choiceground.x ,choiceground.y =viewX+650 ,viewY+450
+    choiceground.x ,choiceground.y =viewX+600-50 ,viewY+400-50
     choiceground.tiletype , choiceground.tilenum = tt ,tn
         
 def render_world():
     clear_canvas()
+    #background.drawback()
     for o in world:
         o.draw()
     choiceground.draw()
@@ -158,7 +179,8 @@ while key:
     render_world()
     #print (viewX,viewY)
     delay(0.1)
-
+    
+save_tiles(file_map, world)
+print('save')
 close_canvas()
-save_tiles(file_map, tiles)
 
