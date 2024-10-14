@@ -36,6 +36,8 @@ class Ground:
         self.image = load_image('Ground.png')
         self.water = load_image('Water.png')
         self.cliff = load_image('Cliff.png')
+        self.ground_ani = load_image('Ground_ani.png')
+        self.water_ani = load_image('Water_ani.png')
     def update(self):
         self.frame = (self.frame+1)%8
         pass
@@ -55,8 +57,13 @@ class Ground:
             self.image.clip_composite_draw(0*176 + (self.tilenum%11)*16 , 0*80 + (4 - self.tilenum//11) *16, 16 + 0*176 , 16+ 0*80
                                            ,0,'i',WIDTH//2-viewX+ self.x+tilesize//2 ,HEIGHT//2 -viewY + self.y +tilesize//2 ,
                                            tilesize,tilesize)
-    def drawback(self):
+        elif self.tiletype==4:
+            if self.tilenum<5:
+                self.water_ani.clip_composite_draw(self.frame*16 , (4 - self.tilenum)*16 , 16 , 16 ,
+                                           0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
+            
         
+    def drawback(self):
         self.image.clip_composite_draw(0*176 + (12%11)*16 , 2*80 + (4 - 12//11) *16, 16 + 0*176 , 16+ 0*80
                                            ,0,'i',WIDTH//2, HEIGHT//2,
                                            WIDTH,HEIGHT)
@@ -102,16 +109,22 @@ def handle_events():
             
         if event.type == SDL_KEYDOWN and event.key==SDLK_2:
             tt=(tt+1)
+            print('tiletype: ',tt,'tilenum: ', tn)
         elif event.type == SDL_KEYDOWN and event.key==SDLK_1:
             tt=(tt-1)
+            print('tiletype: ',tt,'tilenum: ', tn)
         elif event.type == SDL_KEYDOWN and event.key==SDLK_4:
             tn=(tn+1)%55
+            print('tiletype: ',tt,'tilenum: ', tn)
         elif event.type == SDL_KEYDOWN and event.key==SDLK_6:
             tn=(tn+5)%55
+            print('tiletype: ',tt,'tilenum: ', tn)
         elif event.type == SDL_KEYDOWN and event.key==SDLK_3:
             tn=(tn-1)%55
+            print('tiletype: ',tt,'tilenum: ', tn)
         elif event.type == SDL_KEYDOWN and event.key==SDLK_5:
             tn=(tn-5)%55
+            print('tiletype: ',tt,'tilenum: ', tn)
             
         if event.type == SDL_MOUSEMOTION:
             x,y = event.x , HEIGHT -1 -event.y
