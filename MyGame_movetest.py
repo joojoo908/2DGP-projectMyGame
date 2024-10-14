@@ -12,6 +12,8 @@ world =[]
 tilesize = 100
 file_map = 'tiles.txt'
 
+key_asdf =[False,False,False,False]
+
 def len(x1,y1,x2,y2):
     return math.sqrt((x2-x1)**2 + (y2-y1)**2)
 def angle(x1,y1,x2,y2):
@@ -27,49 +29,76 @@ def load_tiles(filename):
     return tiles
 
 class player:
-    global viewX ,viewY
-    global click
+    #global viewX ,viewY
     global x,y
     global mx,my
+    global key_asdf
     def __init__(self):
         self.x,self.y = 0,0
         self.framex = 0
         self.framey = 10
-        self.state = 0  # 0:idle 1: move
-        self.dire =0
+        self.state = 0  # 0:idle 1: move  2: dash
+        self.dire =0 # 방향
+        self.framecnt = 0
         self.image = load_image('red_hood.png')
         self.idle = load_image('red_hood_idle.png')
 
     def update(self):
         global viewX ,viewY
         #------애니메이션---
+        self.framecnt+=1
+        if key_asdf[2]:
+            self.state=2
+            self.framecnt=0
+            self.framex=0
+            key_asdf[2] = False
+        
         if self.state==0: #idle
-            self.framex = (self.framex+1)%18
+            if self.framecnt>5:
+                self.framex = (self.framex+1)%18
+                self.framecnt =0;
         elif self.state==1: #move
-            self.framex = (self.framex+1)%12
-            if self.framex==0:
-                self.framey = (self.framey-1)%11
-                if self.framey==8:
-                    self.framey=10
-                    self.framex=1
-        #----이동---
-        speed = 15
+            if self.framecnt>5:
+                self.framex = (self.framex+1)%12
+                if self.framex==0:
+                    self.framey = (self.framey-1)%11
+                    if self.framey==8:
+                        self.framey=10
+                        self.framex=1
+                self.framecnt=0
+        elif self.state==2:
+            if self.framecnt>5:
+                self.framex = (self.framex+1)
+                if self.framex>4:
+                    self.state=1
+                    key_asdf[2] =False
+                self.framecnt=0
+        
+        #-------이동-----
+        speed = 5
+        
         if len(self.x,self.y,mx,my) > speed:
-            self.state=1
-            self.dire = mx <= self.x
+            if self.state==2:
+                speed =10
+            else:
+                self.state=1
+                
+            self.dire = mx <= self.x # 플에이어가 바라보는 방향 설정
+            
+            # 플레이어가 일정 범위 밖일때 맵 전체 이동
             if math.cos(angle(self.x,self.y,mx,my))<0 :
                 if self.x <= viewX -400:
                     viewX += speed*math.cos(angle(self.x,self.y,mx,my))
             elif math.cos(angle(self.x,self.y,mx,my))>0 :
                 if self.x >= viewX +400:
                     viewX += speed*math.cos(angle(self.x,self.y,mx,my))
-                    
             if math.sin(angle(self.x,self.y,mx,my))<0 :
                 if self.y <= viewY -200:
                     viewY += speed*math.sin(angle(self.x,self.y,mx,my))
             elif math.sin(angle(self.x,self.y,mx,my))>0 :
                 if self.y >= viewY +300:
                     viewY += speed*math.sin(angle(self.x,self.y,mx,my))
+            # 플레이어 이동
             self.x += speed*math.cos(angle(self.x,self.y,mx,my))
             self.y += speed*math.sin(angle(self.x,self.y,mx,my))
             
@@ -82,7 +111,7 @@ class player:
     def draw(self):
         size = 112
         playersize=1.8
-        #좌측
+        
         if self.state==0:
             if self.dire == 0:
                 self.idle.clip_composite_draw(self.framex*80, 0 ,80,80
@@ -97,8 +126,15 @@ class player:
             else:
                 self.image.clip_composite_draw(self.framex*size, self.framey*133 ,size,133
                                                ,0,'i',WIDTH//2-viewX+self.x, HEIGHT//2 -viewY + self.y,200*playersize,200*playersize)
+        elif self.state==2:
+            if self.dire == 0:
+                self.image.clip_composite_draw((self.framex+4) *size, 6 *133 ,size,133
+                                               ,0,'h',WIDTH//2-viewX+self.x, HEIGHT//2 -viewY + self.y,200*playersize,200*playersize)
+            else:
+                self.image.clip_composite_draw((self.framex+4) *size, 6 *133 ,size,133
+                                               ,0,'i',WIDTH//2-viewX+self.x, HEIGHT//2 -viewY + self.y,200*playersize,200*playersize)
 
-                
+            
 class Ground:
     global viewX , viewY
     def __init__(self,x,y,tiletype,tilenum):
@@ -135,10 +171,12 @@ class Ground:
 def handle_events():
     global move
     global key
-    global up, down , r ,l
+    global key_asdf
     global x,y
     global click
     global mx,my
+
+    key =True
     events = get_events()
 
     for event in events:
@@ -151,26 +189,11 @@ def handle_events():
                 mx ,my = -WIDTH//2 + viewX + x, -HEIGHT//2 + viewY +y+50
                 #print(viewX,viewY)
         elif event.type == SDL_KEYDOWN:
-            key =True
-            if event.key==SDLK_RIGHT:
-                r=1;
-            if event.key==SDLK_LEFT:
-                l=1
-            if event.key==SDLK_UP:
-                up=1
-            if event.key==SDLK_DOWN:
-                down =1
-            if event.key==SDLK_ESCAPE:
-                key=0
+            if event.key==SDLK_d:
+                print('dash')
+                key_asdf[2]=True
         elif event.type == SDL_KEYUP:
-            if event.key==SDLK_RIGHT:
-                r=0
-            if event.key==SDLK_LEFT:
-                l=0
-            if event.key==SDLK_UP:
-                up=0
-            if event.key==SDLK_DOWN:
-                down =0
+            pass
 
 # 맵 불러오기
 tiles = load_tiles(file_map)
@@ -212,7 +235,7 @@ while key:
     update_world()
     render_world()
     #print(viewX,viewY)
-    delay(0.05)
+    delay(0.01)
 
 close_canvas()
 
