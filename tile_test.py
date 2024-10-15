@@ -31,6 +31,7 @@ class Ground:
     def __init__(self,x,y,tiletype,tilenum):
         self.x,self.y = x,y
         self.frame=0
+        self.framecnt=0
         self.tiletype=tiletype
         self.tilenum=tilenum
         self.image = load_image('Ground.png')
@@ -61,6 +62,10 @@ class Ground:
             if self.tilenum<5:
                 self.water_ani.clip_composite_draw(self.frame*16 , (4 - self.tilenum)*16 , 16 , 16 ,
                                            0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
+            else:
+                self.ground_ani.clip_composite_draw( (self.frame%2)*16*5 +(self.tilenum%5)*16 , (6 - (self.tilenum//5) )*16  , 16 , 16 ,
+                                           0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
+                
             
         
     def drawback(self):
