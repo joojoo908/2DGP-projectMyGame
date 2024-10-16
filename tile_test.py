@@ -28,19 +28,35 @@ def load_tiles(filename):
 
 class Ground:
     global viewX , viewY
+    image = None
+    
     def __init__(self,x,y,tiletype,tilenum):
         self.x,self.y = x,y
         self.frame=0
         self.framecnt=0
         self.tiletype=tiletype
         self.tilenum=tilenum
-        self.image = load_image('Ground.png')
-        self.water = load_image('Water.png')
-        self.cliff = load_image('Cliff.png')
-        self.ground_ani = load_image('Ground_ani.png')
-        self.water_ani = load_image('Water_ani.png')
+
+        if Ground.image==None:
+            if tiletype==0 or tiletype==3:
+                self.image = load_image('Ground.png')
+            elif tiletype==1:
+                self.image = load_image('Water.png')
+            elif tiletype==2:
+                self.image = load_image('Cliff.png')
+            elif tiletype==4:
+                if tilenum<5:
+                    self.image = load_image('Water_ani.png')
+                else:
+                    self.image = load_image('Ground_ani.png')
+        
     def update(self):
-        self.frame = (self.frame+1)%8
+        if self.tiletype==1 or self.tiletype==4:
+            self.framecnt+=1
+            if self.framecnt>9:
+                self.frame = (self.frame+1)%8
+                self.framecnt =0
+        
         pass
     def draw(self):
          #self.image.draw(self.x,self.y)
@@ -49,10 +65,10 @@ class Ground:
                                            ,0,'i',WIDTH//2-viewX+ self.x+tilesize//2 ,HEIGHT//2 -viewY + self.y +tilesize//2 ,
                                            tilesize,tilesize)
         elif self.tiletype==1:
-            self.water.clip_composite_draw(self.frame*176 +(self.tilenum%11)*16 , 1*80 +(4 - self.tilenum//11)*16 , 16 + 0*176 , 16+ 0*80 ,
+            self.image.clip_composite_draw(self.frame*176 +(self.tilenum%11)*16 , 1*80 +(4 - self.tilenum//11)*16 , 16 + 0*176 , 16+ 0*80 ,
                                            0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
         elif self.tiletype==2:
-            self.cliff.clip_composite_draw(0*112 + (self.tilenum%7)*16 , 0*80 +(7 - self.tilenum//7)*16 , 16 + 0*176 , 16+ 0*80 ,
+            self.image.clip_composite_draw(0*112 + (self.tilenum%7)*16 , 0*80 +(7 - self.tilenum//7)*16 , 16 + 0*176 , 16+ 0*80 ,
                                            0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
         elif self.tiletype==3:
             self.image.clip_composite_draw(0*176 + (self.tilenum%11)*16 , 0*80 + (4 - self.tilenum//11) *16, 16 + 0*176 , 16+ 0*80
@@ -60,16 +76,16 @@ class Ground:
                                            tilesize,tilesize)
         elif self.tiletype==4:
             if self.tilenum<5:
-                self.water_ani.clip_composite_draw(self.frame*16 , (4 - self.tilenum)*16 , 16 , 16 ,
+                self.image.clip_composite_draw(self.frame*16 , (4 - self.tilenum)*16 , 16 , 16 ,
                                            0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
             else:
-                self.ground_ani.clip_composite_draw( (self.frame%2)*16*5 +(self.tilenum%5)*16 , (6 - (self.tilenum//5) )*16  , 16 , 16 ,
+                self.image.clip_composite_draw( (self.frame%2)*16*5 +(self.tilenum%5)*16 , (6 - (self.tilenum//5) )*16  , 16 , 16 ,
                                            0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
                 
             
         
     def drawback(self):
-        self.image.clip_composite_draw(0*176 + (12%11)*16 , 2*80 + (4 - 12//11) *16, 16 + 0*176 , 16+ 0*80
+        self.ground.clip_composite_draw(0*176 + (12%11)*16 , 2*80 + (4 - 12//11) *16, 16 + 0*176 , 16+ 0*80
                                            ,0,'i',WIDTH//2, HEIGHT//2,
                                            WIDTH,HEIGHT)
     
@@ -196,7 +212,7 @@ while key:
     update_world()
     render_world()
     #print (viewX,viewY)
-    delay(0.1)
+    delay(0.01)
     
 save_tiles(file_map, world)
 print('save')

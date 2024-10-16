@@ -140,13 +140,21 @@ class Ground:
     def __init__(self,x,y,tiletype,tilenum):
         self.x,self.y = x,y
         self.frame=0
+        self.framecnt=0
         self.tiletype=tiletype
         self.tilenum=tilenum
         self.image = load_image('Ground.png')
         self.water = load_image('Water.png')
         self.cliff = load_image('Cliff.png')
+        self.ground_ani = load_image('Ground_ani.png')
+        self.water_ani = load_image('Water_ani.png')
     def update(self):
-        self.frame = (self.frame+1)%8
+        if self.tiletype==1 or self.tiletype==4:
+            self.framecnt+=1
+            if self.framecnt>9:
+                self.frame = (self.frame+1)%8
+                self.framecnt =0
+        
         pass
     def draw(self):
          #self.image.draw(self.x,self.y)
@@ -164,10 +172,20 @@ class Ground:
             self.image.clip_composite_draw(0*176 + (self.tilenum%11)*16 , 0*80 + (4 - self.tilenum//11) *16, 16 + 0*176 , 16+ 0*80
                                            ,0,'i',WIDTH//2-viewX+ self.x+tilesize//2 ,HEIGHT//2 -viewY + self.y +tilesize//2 ,
                                            tilesize,tilesize)
+        elif self.tiletype==4:
+            if self.tilenum<5:
+                self.water_ani.clip_composite_draw(self.frame*16 , (4 - self.tilenum)*16 , 16 , 16 ,
+                                           0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
+            else:
+                self.ground_ani.clip_composite_draw( (self.frame%2)*16*5 +(self.tilenum%5)*16 , (6 - (self.tilenum//5) )*16  , 16 , 16 ,
+                                           0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
+        
     def drawback(self):
         self.image.clip_composite_draw(0*176 + (12%11)*16 , 2*80 + (4 - 12//11) *16, 16 + 0*176 , 16+ 0*80
                                            ,0,'i',WIDTH//2, HEIGHT//2,
                                            WIDTH,HEIGHT)
+    
+
 def handle_events():
     global move
     global key
