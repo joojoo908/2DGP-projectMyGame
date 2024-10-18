@@ -1,13 +1,15 @@
-
 from pico2d import *
 import math
 import random
+
+from Ground import Ground
 
 WIDTH, HEIGHT = 1400 , 1000
 click =False;
 x,y =0,0
 mx,my = 0,0
 viewX ,viewY =0,0
+grounds = []
 world =[]
 tilesize = 100
 file_map = 'tiles.txt'
@@ -135,55 +137,6 @@ class player:
                                                ,0,'i',WIDTH//2-viewX+self.x, HEIGHT//2 -viewY + self.y,200*playersize,200*playersize)
 
             
-class Ground:
-    global viewX , viewY
-    def __init__(self,x,y,tiletype,tilenum):
-        self.x,self.y = x,y
-        self.frame=0
-        self.framecnt=0
-        self.tiletype=tiletype
-        self.tilenum=tilenum
-        self.image = load_image('Ground.png')
-        self.water = load_image('Water.png')
-        self.cliff = load_image('Cliff.png')
-        self.ground_ani = load_image('Ground_ani.png')
-        self.water_ani = load_image('Water_ani.png')
-    def update(self):
-        if self.tiletype==1 or self.tiletype==4:
-            self.framecnt+=1
-            if self.framecnt>9:
-                self.frame = (self.frame+1)%8
-                self.framecnt =0
-        
-        pass
-    def draw(self):
-         #self.image.draw(self.x,self.y)
-        if self.tiletype==0:
-            self.image.clip_composite_draw(0*176 + (self.tilenum%11)*16 , 2*80 + (4 - self.tilenum//11) *16, 16 + 0*176 , 16+ 0*80
-                                           ,0,'i',WIDTH//2-viewX+ self.x+tilesize//2 ,HEIGHT//2 -viewY + self.y +tilesize//2 ,
-                                           tilesize,tilesize)
-        elif self.tiletype==1:
-            self.water.clip_composite_draw(self.frame*176 +(self.tilenum%11)*16 , 1*80 +(4 - self.tilenum//11)*16 , 16 + 0*176 , 16+ 0*80 ,
-                                           0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
-        elif self.tiletype==2:
-            self.cliff.clip_composite_draw(0*112 + (self.tilenum%7)*16 , 0*80 +(7 - self.tilenum//7)*16 , 16 + 0*176 , 16+ 0*80 ,
-                                           0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
-        elif self.tiletype==3:
-            self.image.clip_composite_draw(0*176 + (self.tilenum%11)*16 , 0*80 + (4 - self.tilenum//11) *16, 16 + 0*176 , 16+ 0*80
-                                           ,0,'i',WIDTH//2-viewX+ self.x+tilesize//2 ,HEIGHT//2 -viewY + self.y +tilesize//2 ,
-                                           tilesize,tilesize)
-        elif self.tiletype==4:
-            if self.tilenum<5:
-                self.water_ani.clip_composite_draw(self.frame*16 , (4 - self.tilenum)*16 , 16 , 16 ,
-                                           0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
-            else:
-                self.ground_ani.clip_composite_draw( (self.frame%2)*16*5 +(self.tilenum%5)*16 , (6 - (self.tilenum//5) )*16  , 16 , 16 ,
-                                           0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
-        
-    def drawback(self):
-        self.image.clip_composite_draw(0*176 + (12%11)*16 , 2*80 + (4 - 12//11) *16, 16 + 0*176 , 16+ 0*80
-                                           ,0,'i',WIDTH//2, HEIGHT//2,
-                                           WIDTH,HEIGHT)
     
 
 def handle_events():
@@ -218,6 +171,7 @@ tiles = load_tiles(file_map)
 def reset_world():
     global key
     global world
+    global grounds
     global tiles
     global background
 
@@ -227,18 +181,22 @@ def reset_world():
 
     for tile in tiles:
         ground = Ground(*tile)  # unpacking하여 인자로 전달
-        world.append(ground)
+        grounds.append(ground)
 
     p1 = player()
     world.append(p1)
     
 def update_world():
+    for g in grounds:
+        g.update()
     for o in world:
         o.update()
         
 def render_world():
     clear_canvas()
     background.drawback()
+    for g in grounds:
+        g.draw(viewX ,viewY)
     for o in world:
         o.draw()
     update_canvas()

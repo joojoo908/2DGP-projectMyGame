@@ -2,6 +2,8 @@ from pico2d import *
 import math
 import random
 
+from Ground import Ground
+
 WIDTH, HEIGHT = 1400 , 1000
 click =False;
 x,y =0,0
@@ -27,7 +29,7 @@ def load_tiles(filename):
     return tiles
 
 class Ground:
-    global viewX , viewY
+    #global viewX , viewY
     image = None
     
     def __init__(self,x,y,tiletype,tilenum):
@@ -58,7 +60,7 @@ class Ground:
                 self.framecnt =0
         
         pass
-    def draw(self):
+    def draw(self,viewX,viewY):
          #self.image.draw(self.x,self.y)
         if self.tiletype==0:
             self.image.clip_composite_draw(0*176 + (self.tilenum%11)*16 , 2*80 + (4 - self.tilenum//11) *16, 16 + 0*176 , 16+ 0*80
@@ -85,7 +87,7 @@ class Ground:
             
         
     def drawback(self):
-        self.ground.clip_composite_draw(0*176 + (12%11)*16 , 2*80 + (4 - 12//11) *16, 16 + 0*176 , 16+ 0*80
+        self.image.clip_composite_draw(0*176 + (12%11)*16 , 2*80 + (4 - 12//11) *16, 16 + 0*176 , 16+ 0*80
                                            ,0,'i',WIDTH//2, HEIGHT//2,
                                            WIDTH,HEIGHT)
     
@@ -198,8 +200,8 @@ def render_world():
     clear_canvas()
     #background.drawback()
     for o in world:
-        o.draw()
-    choiceground.draw()
+        o.draw(viewX,viewY)
+    choiceground.draw(viewX,viewY)
     update_canvas()
 
 
