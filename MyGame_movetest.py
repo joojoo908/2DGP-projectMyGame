@@ -200,7 +200,9 @@ def render_world():
     clear_canvas()
     background.drawback()
     for g in grounds:
-        g.draw(viewX ,viewY)
+        #카메라 내부만 랜더링 
+        if g.x>viewX-WIDTH-100//2 and g.x<viewX+WIDTH//2 and g.y>viewY-HEIGHT//2-100 and g.y<viewY+HEIGHT//2:
+            g.draw(viewX ,viewY)
     for o in world:
         o.draw()
     update_canvas()
