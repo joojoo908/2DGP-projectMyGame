@@ -35,6 +35,8 @@ class player:
     global x,y
     global mx,my
     global key_asdf
+    image =None
+    
     def __init__(self):
         self.x,self.y = 0,0
         self.framex = 0
@@ -42,8 +44,14 @@ class player:
         self.state = 0  # 0:idle 1: move  2: dash
         self.dire =0 # 방향
         self.framecnt = 0
-        self.image = load_image('red_hood.png')
-        self.idle = load_image('red_hood_idle.png')
+        if Ground.image==None:
+            self.image = load_image('red_hood.png')
+            self.idle = load_image('red_hood_idle.png')
+
+    def Dash(self):
+        self.state=2
+        self.framecnt=0
+        self.framex=0
 
     def update(self):
         global viewX ,viewY
@@ -51,7 +59,6 @@ class player:
         self.framecnt+=1
         if key_asdf[2]:
             self.state=2
-            self.framecnt=0
             self.framex=0
             key_asdf[2] = False
         
@@ -113,7 +120,7 @@ class player:
     def draw(self):
         size = 112
         playersize=1.8
-        
+        #self.image.opacify(100) #투명화
         if self.state==0:
             if self.dire == 0:
                 self.idle.clip_composite_draw(self.framex*80, 0 ,80,80
@@ -136,9 +143,6 @@ class player:
                 self.image.clip_composite_draw((self.framex+4) *size, 6 *133 ,size,133
                                                ,0,'i',WIDTH//2-viewX+self.x, HEIGHT//2 -viewY + self.y,200*playersize,200*playersize)
 
-            
-    
-
 def handle_events():
     global move
     global key
@@ -146,7 +150,7 @@ def handle_events():
     global x,y
     global click
     global mx,my
-
+    
     key =True
     events = get_events()
 

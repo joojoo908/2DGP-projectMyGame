@@ -2,7 +2,7 @@ from pico2d import *
 import math
 import random
 
-from Ground import Ground
+#from Ground import Ground
 
 WIDTH, HEIGHT = 1400 , 1000
 click =False;
@@ -13,8 +13,14 @@ file_map = 'tiles.txt'
 tiles = []
 world = []
 tt ,tn = 0,0
+tile_object =0
 
 def save_tiles(filename, world):
+    with open(filename, 'w') as f:
+        for ground in world:
+            f.write(f"({ground.x}, {ground.y}, {ground.tiletype}, {ground.tilenum})\n")
+
+def save_objects(filename, world):
     with open(filename, 'w') as f:
         for ground in world:
             f.write(f"({ground.x}, {ground.y}, {ground.tiletype}, {ground.tilenum})\n")
@@ -30,7 +36,7 @@ def load_tiles(filename):
 
 class Ground:
     #global viewX , viewY
-    image = None
+    #image = None
     
     def __init__(self,x,y,tiletype,tilenum):
         self.x,self.y = x,y
@@ -39,18 +45,11 @@ class Ground:
         self.tiletype=tiletype
         self.tilenum=tilenum
 
-        if Ground.image==None:
-            if tiletype==0 or tiletype==3:
-                self.image = load_image('Ground.png')
-            elif tiletype==1:
-                self.image = load_image('Water.png')
-            elif tiletype==2:
-                self.image = load_image('Cliff.png')
-            elif tiletype==4:
-                if tilenum<5:
-                    self.image = load_image('Water_ani.png')
-                else:
-                    self.image = load_image('Ground_ani.png')
+        self.image = load_image('Ground.png')
+        self.water = load_image('Water.png')
+        self.cliff = load_image('Cliff.png')
+        self.ground_ani = load_image('Ground_ani.png')
+        self.water_ani = load_image('Water_ani.png')
         
     def update(self):
         if self.tiletype==1 or self.tiletype==4:
@@ -67,10 +66,10 @@ class Ground:
                                            ,0,'i',WIDTH//2-viewX+ self.x+tilesize//2 ,HEIGHT//2 -viewY + self.y +tilesize//2 ,
                                            tilesize,tilesize)
         elif self.tiletype==1:
-            self.image.clip_composite_draw(self.frame*176 +(self.tilenum%11)*16 , 1*80 +(4 - self.tilenum//11)*16 , 16 + 0*176 , 16+ 0*80 ,
+            self.water.clip_composite_draw(self.frame*176 +(self.tilenum%11)*16 , 1*80 +(4 - self.tilenum//11)*16 , 16 + 0*176 , 16+ 0*80 ,
                                            0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
         elif self.tiletype==2:
-            self.image.clip_composite_draw(0*112 + (self.tilenum%7)*16 , 0*80 +(7 - self.tilenum//7)*16 , 16 + 0*176 , 16+ 0*80 ,
+            self.cliff.clip_composite_draw(0*112 + (self.tilenum%7)*16 , 0*80 +(7 - self.tilenum//7)*16 , 16 + 0*176 , 16+ 0*80 ,
                                            0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
         elif self.tiletype==3:
             self.image.clip_composite_draw(0*176 + (self.tilenum%11)*16 , 0*80 + (4 - self.tilenum//11) *16, 16 + 0*176 , 16+ 0*80
@@ -78,19 +77,19 @@ class Ground:
                                            tilesize,tilesize)
         elif self.tiletype==4:
             if self.tilenum<5:
-                self.image.clip_composite_draw(self.frame*16 , (4 - self.tilenum)*16 , 16 , 16 ,
+                self.water_ani.clip_composite_draw(self.frame*16 , (4 - self.tilenum)*16 , 16 , 16 ,
                                            0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
             else:
-                self.image.clip_composite_draw( (self.frame%2)*16*5 +(self.tilenum%5)*16 , (6 - (self.tilenum//5) )*16  , 16 , 16 ,
+                self.ground_ani.clip_composite_draw( (self.frame%2)*16*5 +(self.tilenum%5)*16 , (6 - (self.tilenum//5) )*16  , 16 , 16 ,
                                            0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
-                
-            
         
     def drawback(self):
         self.image.clip_composite_draw(0*176 + (12%11)*16 , 2*80 + (4 - 12//11) *16, 16 + 0*176 , 16+ 0*80
                                            ,0,'i',WIDTH//2, HEIGHT//2,
                                            WIDTH,HEIGHT)
-    
+
+class Object:
+    pass
 
 def get_ground(x, y):
     # 클릭한 위치에 이미 Ground가 있는지 확인하고 해당 Ground를 반환
@@ -106,6 +105,7 @@ def handle_events():
     global click
     global viewX,viewY
     global tt,tn
+    global tile_object
     global file_map ,tiles
     events = get_events()
     for event in events:
@@ -121,9 +121,8 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key==SDLK_w:
             viewY+=move
         #타일맵 저
-        #if event.type == SDL_KEYDOWN and event.key==SDLK_t:
-            #print('save')
-            #save_tiles(file_map, tiles)
+        if event.type == SDL_KEYDOWN and event.key==SDLK_c:
+            tile_object = not tile_object
         
         if event.type == SDL_KEYDOWN and event.key==SDLK_p:
             print(", ".join(f"{o.x}, {o.y}, {o.tiletype}, {o.tilenum}" for o in world))
@@ -156,16 +155,19 @@ def handle_events():
         elif event.type == SDL_MOUSEBUTTONUP:
             click =False
         if click:
-            ground = get_ground(x, y)
-            if ground:
+            if not tile_object:
+                ground = get_ground(x, y)
+                if ground:
                 # 이미 존재하는 타일이 있을 경우, 타일의 타입과 번호 변경
-                ground.tiletype = tt
-                ground.tilenum = tn
-            else:
-                # 타일이 없을 경우, 새로운 타일 생성
-                ground = Ground((x+viewX) - (x+viewX)%tilesize - WIDTH//2,
+                    ground.tiletype = tt
+                    ground.tilenum = tn
+                else:
+                    # 타일이 없을 경우, 새로운 타일 생성
+                    ground = Ground((x+viewX) - (x+viewX)%tilesize - WIDTH//2,
                                 (y+viewY)-(y+viewY) %tilesize - HEIGHT//2, tt, tn)
-                world.append(ground)
+                    world.append(ground)
+            else:
+                pass
 
 #save_tiles(file_map, tiles)
 # 파일에서 tiles 불러오기
@@ -193,7 +195,7 @@ def reset_world():
 def update_world():
     for o in world:
         o.update()
-    choiceground.x ,choiceground.y =viewX+600-50 ,viewY+400-50
+    choiceground.x ,choiceground.y = viewX+600-50 ,viewY+400-50
     choiceground.tiletype , choiceground.tilenum = tt ,tn
         
 def render_world():
