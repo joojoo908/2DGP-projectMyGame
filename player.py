@@ -22,6 +22,7 @@ class Player:
     def __init__(self):
         self.x, self.y = 0, 0
         self.viewX, self.viewY = 0, 0
+        self.mx,self.my = 0,0
         self.framex = 0
         self.framey = 10
         self.state = 0  # 0:idle 1: move  2: dash 3:attack1
@@ -34,7 +35,8 @@ class Player:
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
-             Idle: {mouse_click: Run}
+            Idle: {mouse_click: Run},
+            Run: {run_over: Idle ,mouse_click: Run }
               })
 
     def handle_event(self ,event):
@@ -80,6 +82,8 @@ class Idle:
 class Run:
     @staticmethod
     def enter(p1,e):
+        p1.framecnt = 0
+        p1.mx, p1.my = e[1].x-WIDTH//2 + p1.viewX,  HEIGHT -e[1].y- HEIGHT//2 + p1.viewY+50
         pass
 
     @staticmethod
@@ -96,10 +100,46 @@ class Run:
                     p1.framey = 10
                     p1.framex = 1
             p1.framecnt = 0
+        p1.framecnt += 1
+
+        speed=5
+        mx, my = p1.mx,p1.my
+        if len(p1.x, p1.y, mx, my) > speed:
+            p1.dire = mx <= p1.x  # 플에이어가 바라보는 방향 설정
+            # 플레이어가 일정 범위 밖일때 맵 전체 이동
+            if math.cos(angle(p1.x, p1.y, mx, my)) < 0:
+                if p1.x <= p1.viewX - 400:
+                    p1.viewX += speed * math.cos(angle(p1.x, p1.y, mx, my))
+            elif math.cos(angle(p1.x, p1.y, mx, my)) > 0:
+                if p1.x >= p1.viewX + 400:
+                    p1.viewX += speed * math.cos(angle(p1.x, p1.y, mx, my))
+            if math.sin(angle(p1.x, p1.y, mx, my)) < 0:
+                if p1.y <= p1.viewY - 200:
+                    p1.viewY += speed * math.sin(angle(p1.x, p1.y, mx, my))
+            elif math.sin(angle(p1.x, p1.y, mx, my)) > 0:
+                if p1.y >= p1.viewY + 300:
+                    p1.viewY += speed * math.sin(angle(p1.x, p1.y, mx, my))
+            # 플레이어 이동
+            p1.x += speed * math.cos(angle(p1.x, p1.y, mx, my))
+            p1.y += speed * math.sin(angle(p1.x, p1.y, mx, my))
+        else:
+            p1.x = mx
+            p1.y = my
+            p1.state_machine.add_event(('RUN_OVER', 0))
 
     @staticmethod
     def draw(p1):
-        pass
+        size = 112
+        playersize = 1.8
+        if p1.dire == 0:
+            p1.image.clip_composite_draw(p1.framex * size, p1.framey * 133, size, 133
+                                           , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y,
+                                           200 * playersize, 200 * playersize)
+        else:
+            p1.image.clip_composite_draw(p1.framex * size, p1.framey * 133, size, 133
+                                           , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y,
+                                           200 * playersize, 200 * playersize)
+        #pass
 
 
 class Dash:
