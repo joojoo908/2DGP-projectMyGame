@@ -6,7 +6,7 @@ from Ground import Ground
 
 WIDTH, HEIGHT = 1400 , 1000
 click =False;
-x,y =0,0
+mouse_x,mouse_y =0,0
 mx,my = 0,0
 viewX ,viewY =0,0
 grounds = []
@@ -32,8 +32,8 @@ def load_tiles(filename):
 
 class player:
     #global viewX ,viewY
-    global x,y
-    global mx,my
+    global mouse_x,mouse_y
+    #global mx,my
     global key_asdf
     image =None
     
@@ -41,33 +41,53 @@ class player:
         self.x,self.y = 0,0
         self.framex = 0
         self.framey = 10
-        self.state = 0  # 0:idle 1: move  2: dash
+        self.state = 0  # 0:idle 1: move  2: dash 3:attack1
         self.dire =0 # 방향
         self.framecnt = 0
-        if Ground.image==None:
-            self.image = load_image('red_hood.png')
-            self.idle = load_image('red_hood_idle.png')
+        #if self.image==None:
+        self.image = load_image('red_hood.png')
+        self.idle = load_image('red_hood_idle.png')
 
     def Dash(self):
         self.state=2
         self.framecnt=0
         self.framex=0
+    def move_p(self,mx,my,speed):
+        if math.cos(angle(self.x,self.y,mx,my))<0 :
+            if self.x <= viewX -400:
+                viewX += speed*math.cos(angle(self.x,self.y,mx,my))
+            elif math.cos(angle(self.x,self.y,mx,my))>0 :
+                if self.x >= viewX +400:
+                    viewX += speed*math.cos(angle(self.x,self.y,mx,my))
+            if math.sin(angle(self.x,self.y,mx,my))<0 :
+                if self.y <= viewY -200:
+                    viewY += speed*math.sin(angle(self.x,self.y,mx,my))
+            elif math.sin(angle(self.x,self.y,mx,my))>0 :
+                if self.y >= viewY +300:
+                    viewY += speed*math.sin(angle(self.x,self.y,mx,my))
+            # 플레이어 이동
+            self.x += speed*math.cos(angle(self.x,self.y,mx,my))
+            self.y += speed*math.sin(angle(self.x,self.y,mx,my))
 
     def update(self):
         global viewX ,viewY
+        global mx,my
+        global mouse_x,mouse_y
         #------애니메이션---
         self.framecnt+=1
         if key_asdf[2]:
             self.state=2
             self.framex=0
             key_asdf[2] = False
-        
+        if key_asdf[3]:
+            self.state=3
+            
         if self.state==0: #idle
-            if self.framecnt>5:
+            if self.framecnt>4:
                 self.framex = (self.framex+1)%18
                 self.framecnt =0;
         elif self.state==1: #move
-            if self.framecnt>5:
+            if self.framecnt>4:
                 self.framex = (self.framex+1)%12
                 if self.framex==0:
                     self.framey = (self.framey-1)%11
@@ -75,7 +95,7 @@ class player:
                         self.framey=10
                         self.framex=1
                 self.framecnt=0
-        elif self.state==2:
+        elif self.state==2: #dash
             if self.framecnt>5:
                 self.framex = (self.framex+1)
                 if self.framex>4:
@@ -91,9 +111,7 @@ class player:
                 speed =10
             else:
                 self.state=1
-                
             self.dire = mx <= self.x # 플에이어가 바라보는 방향 설정
-            
             # 플레이어가 일정 범위 밖일때 맵 전체 이동
             if math.cos(angle(self.x,self.y,mx,my))<0 :
                 if self.x <= viewX -400:
@@ -111,11 +129,29 @@ class player:
             self.x += speed*math.cos(angle(self.x,self.y,mx,my))
             self.y += speed*math.sin(angle(self.x,self.y,mx,my))
             
-        else:
-            self.x =mx
-            self.y =my
-            self.state=0
-            #print(viewX,viewY)
+        else:#마우스 클릭x
+            if self.state==2:
+                speed =10
+                self.dire = mouse_x <= self.x 
+                if math.cos(angle(self.x,self.y,mouse_x,mouse_y))<0 :
+                    if self.x <= viewX -400:
+                        viewX += speed*math.cos(angle(self.x,self.y,mouse_x,mouse_y))
+                elif math.cos(angle(self.x,self.y,mouse_x,mouse_y))>0 :
+                    if self.x >= viewX +400:
+                        viewX += speed*math.cos(angle(self.x,self.y,mouse_x,mouse_y))
+                if math.sin(angle(self.x,self.y,mouse_x,mouse_y))<0 :
+                    if self.y <= viewY -200:
+                        viewY += speed*math.sin(angle(self.x,self.y,mouse_x,mouse_y))
+                elif math.sin(angle(self.x,self.y,mouse_x,mouse_y))>0 :
+                    if self.y >= viewY +300:
+                        viewY += speed*math.sin(angle(self.x,self.y,mouse_x,mouse_y))
+                self.x += speed*math.cos(angle(self.x,self.y,mouse_x,mouse_y))
+                self.y += speed*math.sin(angle(self.x,self.y,mouse_x,mouse_y))
+                mx,my=self.x,self.y
+            else:
+                self.x =mx
+                self.y =my
+                self.state=0
         
     def draw(self):
         size = 112
@@ -147,7 +183,7 @@ def handle_events():
     global move
     global key
     global key_asdf
-    global x,y
+    global mouse_x,mouse_y
     global click
     global mx,my
     
@@ -158,15 +194,18 @@ def handle_events():
         if event.type == SDL_QUIT:
             key = 0
         elif event.type == SDL_MOUSEMOTION:
-            x,y = event.x , HEIGHT -event.y
+            mouse_x,mouse_y = event.x -WIDTH//2 + viewX , HEIGHT -event.y - HEIGHT//2 + viewY+50
         elif event.type == SDL_MOUSEBUTTONDOWN:
             if event.button == SDL_BUTTON_LEFT:
-                mx ,my = -WIDTH//2 + viewX + x, -HEIGHT//2 + viewY +y+50
+                mx ,my = mouse_x, mouse_y
                 #print(viewX,viewY)
         elif event.type == SDL_KEYDOWN:
             if event.key==SDLK_d:
                 print('dash')
                 key_asdf[2]=True
+            elif event.key==SDLK_f:
+                print('attack')
+                key_asdf[3]=True
         elif event.type == SDL_KEYUP:
             pass
 
@@ -211,7 +250,6 @@ def render_world():
 open_canvas(WIDTH, HEIGHT)
 
 reset_world()
-
 while key:
     handle_events()
     update_world()

@@ -201,8 +201,9 @@ def update_world():
 def render_world():
     clear_canvas()
     #background.drawback()
-    for o in world:
-        o.draw(viewX,viewY)
+    for g in world:
+        if g.x>viewX-WIDTH-100//2 and g.x<viewX+WIDTH//2 and g.y>viewY-HEIGHT//2-100 and g.y<viewY+HEIGHT//2:
+            g.draw(viewX,viewY)
     choiceground.draw(viewX,viewY)
     update_canvas()
 
