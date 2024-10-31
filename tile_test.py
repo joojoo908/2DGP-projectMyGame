@@ -11,33 +11,45 @@ viewX , viewY = 0,0
 tilesize = 100
 file_map = 'tiles.txt'
 tiles = []
+tile_dict = {}
 world = []
 tt ,tn = 0,0
 tile_object =0
 
+# def save_tiles(filename, world):
+#     with open(filename, 'w') as f:
+#         for ground in world:
+#             f.write(f"({ground.x}, {ground.y}, {ground.tiletype}, {ground.tilenum})\n")
+#
+# def save_objects(filename, world):
+#     with open(filename, 'w') as f:
+#         for ground in world:
+#             f.write(f"({ground.x}, {ground.y}, {ground.tiletype}, {ground.tilenum})\n")
+#
+# # tiles 불러오기 함수
+# def load_tiles(filename):
+#     tiles = []
+#     with open(filename, 'r') as f:
+#         for line in f:
+#             tile = eval(line.strip())
+#             tiles.append(tile)
+#     return tiles
+
 def save_tiles(filename, world):
     with open(filename, 'w') as f:
-        for ground in world:
-            f.write(f"({ground.x}, {ground.y}, {ground.tiletype}, {ground.tilenum})\n")
+        for (x, y), ground in world.items():
+            f.write(f"({x}, {y}, {ground.tiletype}, {ground.tilenum})\n")
 
-def save_objects(filename, world):
-    with open(filename, 'w') as f:
-        for ground in world:
-            f.write(f"({ground.x}, {ground.y}, {ground.tiletype}, {ground.tilenum})\n")
-
-# tiles 불러오기 함수
 def load_tiles(filename):
-    tiles = []
+    tiles = {}
     with open(filename, 'r') as f:
         for line in f:
             tile = eval(line.strip())
-            tiles.append(tile)
+            x, y, tiletype, tilenum = tile
+            tiles[(x, y)] = Ground(x, y, tiletype, tilenum)
     return tiles
 
 class Ground:
-    #global viewX , viewY
-    #image = None
-    
     def __init__(self,x,y,tiletype,tilenum):
         self.x,self.y = x,y
         self.frame=0
@@ -50,7 +62,6 @@ class Ground:
         self.cliff = load_image('Cliff.png')
         self.ground_ani = load_image('Ground_ani.png')
         self.water_ani = load_image('Water_ani.png')
-        
     def update(self):
         if self.tiletype==1 or self.tiletype==4:
             self.framecnt+=1
@@ -82,7 +93,6 @@ class Ground:
             else:
                 self.ground_ani.clip_composite_draw( (self.frame%2)*16*5 +(self.tilenum%5)*16 , (6 - (self.tilenum//5) )*16  , 16 , 16 ,
                                            0,'i', WIDTH//2-viewX+ self.x +tilesize//2 ,HEIGHT//2 -viewY + self.y+tilesize//2, tilesize,tilesize)
-        
     def drawback(self):
         self.image.clip_composite_draw(0*176 + (12%11)*16 , 2*80 + (4 - 12//11) *16, 16 + 0*176 , 16+ 0*80
                                            ,0,'i',WIDTH//2, HEIGHT//2,
@@ -91,16 +101,19 @@ class Ground:
 class Object:
     pass
 
+# def get_ground(x, y):
+#     # 클릭한 위치에 이미 Ground가 있는지 확인하고 해당 Ground를 반환
+#     for ground in world:
+#         if (ground.x == (x+viewX)-(x+viewX)%tilesize - WIDTH//2 and
+#                 ground.y == (y+viewY)-(y+viewY)%tilesize - HEIGHT//2):
+#             return ground
 def get_ground(x, y):
-    # 클릭한 위치에 이미 Ground가 있는지 확인하고 해당 Ground를 반환
-    for ground in world:
-        if (ground.x == (x+viewX)-(x+viewX)%tilesize - WIDTH//2 and
-                ground.y == (y+viewY)-(y+viewY)%tilesize - HEIGHT//2):
-            return ground
+    # x, y에 해당하는 Ground 객체 반환
+    return world.get((x, y))
     
 def handle_events():
     global move
-    global key
+    global loop
     global x,y
     global click
     global viewX,viewY
@@ -110,7 +123,7 @@ def handle_events():
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
-            key = 0
+            loop = 0
         move=tilesize;
         if event.type == SDL_KEYDOWN and event.key==SDLK_a:
             viewX-=move
@@ -155,55 +168,85 @@ def handle_events():
         elif event.type == SDL_MOUSEBUTTONUP:
             click =False
         if click:
-            if not tile_object:
-                ground = get_ground(x, y)
-                if ground:
-                # 이미 존재하는 타일이 있을 경우, 타일의 타입과 번호 변경
-                    ground.tiletype = tt
-                    ground.tilenum = tn
-                else:
-                    # 타일이 없을 경우, 새로운 타일 생성
-                    ground = Ground((x+viewX) - (x+viewX)%tilesize - WIDTH//2,
-                                (y+viewY)-(y+viewY) %tilesize - HEIGHT//2, tt, tn)
-                    world.append(ground)
+            ground = get_ground(
+                (x + viewX) - (x + viewX) % tilesize - WIDTH // 2,
+                (y + viewY) - (y + viewY) % tilesize - HEIGHT // 2
+            )
+            if ground:
+                ground.tiletype = tt
+                ground.tilenum = tn
+                print('change')
             else:
-                pass
+                ground = Ground(
+                    (x + viewX) - (x + viewX) % tilesize - WIDTH // 2,
+                    (y + viewY) - (y + viewY) % tilesize - HEIGHT // 2,
+                    tt, tn
+                )
+                world[(ground.x, ground.y)] = ground  # 딕셔너리에 추가
+        # if click:
+        #     if not tile_object:
+        #         #adjusted_x = (x + viewX) - (x + viewX) % tilesize - WIDTH // 2
+        #         #adjusted_y = (y + viewY) - (y + viewY) % tilesize - HEIGHT // 2
+        #         ground = get_ground(x, y)
+        #         if ground:
+        #         # 이미 존재하는 타일이 있을 경우, 타일의 타입과 번호 변경
+        #             print('true',ground.tiletype,ground.tilenum)
+        #             ground.tiletype = tt
+        #             ground.tilenum = tn
+        #         else:
+        #             # 타일이 없을 경우, 새로운 타일 생성
+        #             print('no tile')
+        #             ground = Ground((x+viewX) - (x+viewX)%tilesize - WIDTH//2,
+        #                         (y+viewY)-(y+viewY) %tilesize - HEIGHT//2, tt, tn)
+        #             world.append(ground)
+        #     else:
+        #         pass
 
 #save_tiles(file_map, tiles)
 # 파일에서 tiles 불러오기
-tiles = load_tiles(file_map)
+#tiles = load_tiles(file_map)
 
 def reset_world():
-    global key
+    global loop
     global world
     global choiceground
     global tiles
     global background
 
-    
-
-    key=True
+    loop=True
     #world=[]
     background = Ground(0,0,0,0)
     
     choiceground = Ground(viewX+600-50,viewY+400-50,tt,tn)
 
-    for tile in tiles:
-        ground = Ground(*tile)  # unpacking하여 인자로 전달
-        world.append(ground)    
+    world = load_tiles(file_map)
     
 def update_world():
-    for o in world:
-        o.update()
+    # for ground in world.values():
+    #     ground.update()
+    for keyx in range( (viewX -viewX%100)- WIDTH // 2 ,(viewX -viewX%100)+ WIDTH // 2 ,100):
+        for keyy in range((viewY - viewY % 100) - HEIGHT // 2, (viewY - viewY % 100) + HEIGHT // 2, 100):
+            ground = world.get((keyx,keyy))
+            if ground:
+                ground.update()
     choiceground.x ,choiceground.y = viewX+600-50 ,viewY+400-50
     choiceground.tiletype , choiceground.tilenum = tt ,tn
         
 def render_world():
     clear_canvas()
     #background.drawback()
-    for g in world:
-        if g.x>viewX-WIDTH-100//2 and g.x<viewX+WIDTH//2 and g.y>viewY-HEIGHT//2-100 and g.y<viewY+HEIGHT//2:
-            g.draw(viewX,viewY)
+
+    for keyx in range( (viewX -viewX%100)- WIDTH // 2 ,(viewX -viewX%100)+ WIDTH // 2 ,100):
+        for keyy in range((viewY - viewY % 100) - HEIGHT // 2, (viewY - viewY % 100) + HEIGHT // 2, 100):
+            ground = world.get((keyx,keyy))
+            if ground:
+                ground.draw(viewX, viewY)
+
+
+    # for ground in world.values():
+    #     if viewX - WIDTH // 2-100 < ground.x < viewX + WIDTH // 2 and \
+    #             viewY - HEIGHT // 2-100 < ground.y < viewY + HEIGHT // 2:
+    #         ground.draw(viewX, viewY)
     choiceground.draw(viewX,viewY)
     update_canvas()
 
@@ -212,7 +255,7 @@ open_canvas(WIDTH, HEIGHT)
 
 reset_world()
 
-while key:
+while loop:
     handle_events()
     update_world()
     render_world()

@@ -25,11 +25,12 @@ def angle(x1,y1,x2,y2):
 
 # tiles 불러오기 함수
 def load_tiles(filename):
-    tiles = []
+    tiles = {}
     with open(filename, 'r') as f:
         for line in f:
             tile = eval(line.strip())
-            tiles.append(tile)
+            x, y, tiletype, tilenum = tile
+            tiles[(x, y)] = Ground(x, y, tiletype, tilenum)
     return tiles
 
 def handle_events():
@@ -49,7 +50,7 @@ def handle_events():
 
 # 맵 불러오기
 
-tiles = load_tiles(file_map)
+
 def reset_world():
     global key
     global world
@@ -62,17 +63,16 @@ def reset_world():
 
     background = Ground(0,0,0,0)
 
-    for tile in tiles:
-        ground = Ground(*tile)  # unpacking하여 인자로 전달
-        grounds.append(ground)
+
+    grounds = load_tiles(file_map)
 
     p1 = Player()
     world.append(p1)
     
 def update_world():
     global viewX, viewY
-    for g in grounds:
-        g.update()
+    for ground in grounds.values():
+        ground.update()
     for o in world:
         o.update(viewX,viewY)
         viewX, viewY = o.viewX, o.viewY
@@ -80,10 +80,11 @@ def update_world():
 def render_world():
     clear_canvas()
     background.drawback()
-    for g in grounds:
-        #카메라 내부만 랜더링 
-        if g.x>viewX-WIDTH-100//2 and g.x<viewX+WIDTH//2 and g.y>viewY-HEIGHT//2-100 and g.y<viewY+HEIGHT//2:
-            g.draw(viewX ,viewY)
+    for keyx in range((int)(viewX - viewX % 100) - WIDTH // 2, (int)(viewX - viewX % 100) + WIDTH // 2+100, 100):
+        for keyy in range((int)(viewY - viewY % 100) - HEIGHT // 2, (int)(viewY - viewY % 100) + HEIGHT // 2+100, 100):
+            ground = grounds.get((keyx, keyy))
+            if ground:
+                ground.draw(viewX, viewY)
     for o in world:
         o.draw()
     update_canvas()
