@@ -3,12 +3,20 @@ def space_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key==SDLK_SPACE
 def dash_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key==SDLK_d
+def damage(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key==SDLK_l
+def attack(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key==SDLK_a
 def time_out(e):
     return e[0]=='TIME_OUT'
 def run_over(e):
     return e[0]=='RUN_OVER'
-def mouse_move(e):
-    return 0
+def damage_over(e):
+    return e[0]=='DAMAGE_OVER'
+def dash_over(e):
+    return e[0]=='DASH_OVER'
+def death(e):
+    return e[0] == 'DEATH'
 def mouse_click(e):
     return e[0] == 'INPUT' and e[1].type == SDL_MOUSEBUTTONDOWN
 
