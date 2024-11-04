@@ -1,8 +1,16 @@
 from pico2d import *
-import math
 
 WIDTH, HEIGHT = 1400 , 1000
 tilesize = 100
+
+def load_tiles(filename):
+    tiles = {}
+    with open(filename, 'r') as f:
+        for line in f:
+            tile = eval(line.strip())
+            x, y, tiletype, tilenum = tile
+            tiles[(x, y)] = Ground(x, y, tiletype, tilenum)
+    return tiles
 
 class Ground:
     #global viewX , viewY
@@ -64,4 +72,3 @@ class Ground:
         self.image.clip_composite_draw(0*176 + (12%11)*16 , 2*80 + (4 - 12//11) *16, 16 + 0*176 , 16+ 0*80
                                            ,0,'i',WIDTH//2, HEIGHT//2,
                                            WIDTH,HEIGHT)
-    

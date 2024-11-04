@@ -3,7 +3,9 @@ import math
 import random
 
 #import player
+
 from Ground import Ground
+import game_world
 from player import Player
 
 WIDTH, HEIGHT = 1400 , 1000
@@ -11,10 +13,10 @@ click =False;
 mouse_x,mouse_y =0,0
 mx,my = 0,0
 viewX ,viewY =0,0
-grounds = []
+#grounds = {}
 world =[]
 tilesize = 100
-file_map = 'tiles.txt'
+#file_map = 'tiles.txt'
 
 key_asdf =[False,False,False,False]
 
@@ -24,14 +26,6 @@ def angle(x1,y1,x2,y2):
     return math.atan2((y2-y1),(x2-x1))
 
 # tiles 불러오기 함수
-def load_tiles(filename):
-    tiles = {}
-    with open(filename, 'r') as f:
-        for line in f:
-            tile = eval(line.strip())
-            x, y, tiletype, tilenum = tile
-            tiles[(x, y)] = Ground(x, y, tiletype, tilenum)
-    return tiles
 
 def handle_events():
     global move
@@ -54,7 +48,7 @@ def handle_events():
 def reset_world():
     global key
     global world
-    global grounds
+    #global grounds
     global tiles
     global background
     global p1
@@ -63,28 +57,24 @@ def reset_world():
 
     background = Ground(0,0,0,0)
 
-
-    grounds = load_tiles(file_map)
+    game_world.ground_add()
+    #grounds = load_tiles(file_map)
 
     p1 = Player()
     world.append(p1)
     
 def update_world():
     global viewX, viewY
-    for ground in grounds.values():
-        ground.update()
+    game_world.ground_update()
     for o in world:
         o.update(viewX,viewY)
         viewX, viewY = o.viewX, o.viewY
         
 def render_world():
+    global viewX, viewY
     clear_canvas()
     background.drawback()
-    for keyx in range((int)(viewX - viewX % 100) - WIDTH // 2, (int)(viewX - viewX % 100) + WIDTH // 2+100, 100):
-        for keyy in range((int)(viewY - viewY % 100) - HEIGHT // 2, (int)(viewY - viewY % 100) + HEIGHT // 2+100, 100):
-            ground = grounds.get((keyx, keyy))
-            if ground:
-                ground.draw(viewX, viewY)
+    game_world.ground_render(viewX,viewY)
     for o in world:
         o.draw()
     update_canvas()

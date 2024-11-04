@@ -2,7 +2,7 @@ from pico2d import *
 import math
 import random
 
-from Ground import Ground
+import game_world
 from state_machine import *
 import pygame
 
@@ -32,10 +32,10 @@ class Player:
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
-            Idle: {mouse_click: Run , dash_down:Dash ,damage:Damage },
-            Run: {run_over: Idle ,mouse_click: Run, dash_down:Dash ,damage:Damage },
-            Dash: {dash_over:Idle,damage:Damage,dash_down:Dash },
-            Damage: { mouse_click: Run, dash_down:Dash,damage_over:Idle,
+            Idle: {mouse_click: Run , dash_down:Dash ,damage:Damaged },
+            Run: {run_over: Idle ,mouse_click: Run, dash_down:Dash ,damage:Damaged },
+            Dash: {dash_over:Idle,damage:Damaged,dash_down:Dash },
+            Damaged: { mouse_click: Run, dash_down:Dash,damage_over:Idle,
                       death:Death },
             Death: {},
             Attack1:{}
@@ -123,8 +123,13 @@ class Run:
             # 플레이어 이동
             movingx =speed * math.cos(angle(p1.x, p1.y, mx, my))
             movingy =speed * math.sin(angle(p1.x, p1.y, mx, my))
+
+            if game_world.ck_ground(p1.x, p1.y):
+                 print("block")
+
             p1.x += movingx
             p1.y += movingy
+
         else:
             p1.x = mx
             p1.y = my
@@ -211,12 +216,12 @@ class Dash:
                                            , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y,
                                            200 * playersize, 200 * playersize)
 
-class Damage:
+class Damaged:
     @staticmethod
     def enter(p1, e):
         p1.framecnt = 0
         p1.framex =0
-        p1.hp-=1
+        #p1.hp-=1
         print('hp:',p1.hp)
         pass
 
