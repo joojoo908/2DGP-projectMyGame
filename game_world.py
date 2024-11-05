@@ -1,18 +1,9 @@
 
 
-from Ground import Ground
+from Ground import *
 file_map = 'tiles.txt'
 grounds ={}
 WIDTH, HEIGHT = 1400 , 1000
-
-def load_tiles(filename):
-    tiles = {}
-    with open(filename, 'r') as f:
-        for line in f:
-            tile = eval(line.strip())
-            x, y, tiletype, tilenum = tile
-            tiles[(x, y)] = Ground(x, y, tiletype, tilenum)
-    return tiles
 
 def ground_add():
     global grounds
