@@ -16,25 +16,6 @@ world = []
 tt ,tn = 0,0
 tile_object =0
 
-# def save_tiles(filename, world):
-#     with open(filename, 'w') as f:
-#         for ground in world:
-#             f.write(f"({ground.x}, {ground.y}, {ground.tiletype}, {ground.tilenum})\n")
-#
-# def save_objects(filename, world):
-#     with open(filename, 'w') as f:
-#         for ground in world:
-#             f.write(f"({ground.x}, {ground.y}, {ground.tiletype}, {ground.tilenum})\n")
-#
-# # tiles 불러오기 함수
-# def load_tiles(filename):
-#     tiles = []
-#     with open(filename, 'r') as f:
-#         for line in f:
-#             tile = eval(line.strip())
-#             tiles.append(tile)
-#     return tiles
-
 def save_tiles(filename, world):
     with open(filename, 'w') as f:
         for (x, y), ground in world.items():
@@ -101,12 +82,6 @@ class Ground:
 class Object:
     pass
 
-# def get_ground(x, y):
-#     # 클릭한 위치에 이미 Ground가 있는지 확인하고 해당 Ground를 반환
-#     for ground in world:
-#         if (ground.x == (x+viewX)-(x+viewX)%tilesize - WIDTH//2 and
-#                 ground.y == (y+viewY)-(y+viewY)%tilesize - HEIGHT//2):
-#             return ground
 def get_ground(x, y):
     # x, y에 해당하는 Ground 객체 반환
     return world.get((x, y))
@@ -183,28 +158,7 @@ def handle_events():
                     tt, tn
                 )
                 world[(ground.x, ground.y)] = ground  # 딕셔너리에 추가
-        # if click:
-        #     if not tile_object:
-        #         #adjusted_x = (x + viewX) - (x + viewX) % tilesize - WIDTH // 2
-        #         #adjusted_y = (y + viewY) - (y + viewY) % tilesize - HEIGHT // 2
-        #         ground = get_ground(x, y)
-        #         if ground:
-        #         # 이미 존재하는 타일이 있을 경우, 타일의 타입과 번호 변경
-        #             print('true',ground.tiletype,ground.tilenum)
-        #             ground.tiletype = tt
-        #             ground.tilenum = tn
-        #         else:
-        #             # 타일이 없을 경우, 새로운 타일 생성
-        #             print('no tile')
-        #             ground = Ground((x+viewX) - (x+viewX)%tilesize - WIDTH//2,
-        #                         (y+viewY)-(y+viewY) %tilesize - HEIGHT//2, tt, tn)
-        #             world.append(ground)
-        #     else:
-        #         pass
 
-#save_tiles(file_map, tiles)
-# 파일에서 tiles 불러오기
-#tiles = load_tiles(file_map)
 
 def reset_world():
     global loop
@@ -242,11 +196,6 @@ def render_world():
             if ground:
                 ground.draw(viewX, viewY)
 
-
-    # for ground in world.values():
-    #     if viewX - WIDTH // 2-100 < ground.x < viewX + WIDTH // 2 and \
-    #             viewY - HEIGHT // 2-100 < ground.y < viewY + HEIGHT // 2:
-    #         ground.draw(viewX, viewY)
     choiceground.draw(viewX,viewY)
     update_canvas()
 

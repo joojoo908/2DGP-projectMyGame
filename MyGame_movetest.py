@@ -1,31 +1,18 @@
-from pico2d import *
-import math
-import random
 
-#import player
+#play_mod
+from pico2d import *
 
 from Ground import Ground
 import game_world
 from player import Player
 
 WIDTH, HEIGHT = 1400 , 1000
-click =False;
-mouse_x,mouse_y =0,0
+
 mx,my = 0,0
 viewX ,viewY =0,0
-#grounds = {}
+
 world =[]
-tilesize = 100
-#file_map = 'tiles.txt'
 
-key_asdf =[False,False,False,False]
-
-def len(x1,y1,x2,y2):
-    return math.sqrt((x2-x1)**2 + (y2-y1)**2)
-def angle(x1,y1,x2,y2):
-    return math.atan2((y2-y1),(x2-x1))
-
-# tiles 불러오기 함수
 
 def handle_events():
     global move
@@ -41,9 +28,6 @@ def handle_events():
             key = 0
         else:
             p1.handle_event(event)
-
-# 맵 불러오기
-
 
 def reset_world():
     global key
@@ -87,7 +71,6 @@ while key:
     handle_events()
     update_world()
     render_world()
-    #print(viewX,viewY)
     delay(0.01)
 
 close_canvas()

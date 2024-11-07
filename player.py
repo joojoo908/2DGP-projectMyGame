@@ -83,7 +83,7 @@ class Run:
     @staticmethod
     def enter(p1,e):
         p1.framecnt = 0
-        p1.framex =0
+        #p1.framex =0
         p1.mx, p1.my = e[1].x-WIDTH//2 + p1.viewX,  HEIGHT -e[1].y- HEIGHT//2 + p1.viewY+50
         pass
 
@@ -124,11 +124,9 @@ class Run:
             movingx =speed * math.cos(angle(p1.x, p1.y, mx, my))
             movingy =speed * math.sin(angle(p1.x, p1.y, mx, my))
 
-            if game_world.ck_ground(p1.x, p1.y):
-                 print("block")
-
-            p1.x += movingx
-            p1.y += movingy
+            if not game_world.ck_ground(p1.x+movingx, p1.y+movingy):
+                p1.x += movingx
+                p1.y += movingy
 
         else:
             p1.x = mx
@@ -137,6 +135,7 @@ class Run:
 
     @staticmethod
     def draw(p1):
+        print(p1.x,p1.y)
         size = 112
         playersize = 1.8
         if p1.dire == 0:
@@ -193,10 +192,12 @@ class Dash:
             # 플레이어 이동
             movingx = speed * math.cos(angle(p1.x, p1.y, mx, my))
             movingy = speed * math.sin(angle(p1.x, p1.y, mx, my))
-            p1.x += movingx
-            p1.y += movingy
-            p1.mx += movingx
-            p1.my += movingy
+
+            if not game_world.ck_ground(p1.x + movingx, p1.y + movingy):
+                p1.x += movingx
+                p1.y += movingy
+                p1.mx += movingx
+                p1.my += movingy
         else:
             p1.x = mx
             p1.y = my

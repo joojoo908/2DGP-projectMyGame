@@ -25,6 +25,9 @@ def ck_ground(x, y):
     keyx, keyy = x - x % 100, y - y % 100
     ground = grounds.get((keyx, keyy))
     if ground:
-        if ground.tiletype == 1:
+        if ground.tiletype == 1 or ground.tiletype == 2:
             return 1
+        elif ground.tiletype==4 and ground.tilenum<5:
+            return 1
+
     return 0
