@@ -28,6 +28,7 @@ class Player:
 
         self.image = load_image('red_hood.png')
         self.idle = load_image('red_hood_idle.png')
+        self.mouse = load_image('Mouse.png')
 
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
@@ -73,18 +74,19 @@ class Idle:
         if p1.dire == 0:
             p1.idle.clip_composite_draw(p1.framex * 80, 0, 80, 80
                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x + 15,
-                                        HEIGHT // 2 - p1.viewY + p1.y - 15, 140 * playersize, 140 * playersize)
+                                        HEIGHT // 2 - p1.viewY + p1.y - 15+70, 140 * playersize, 140 * playersize)
         else:
             p1.idle.clip_composite_draw(p1.framex * 80, 0, 80, 80
                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x - 15,
-                                        HEIGHT // 2 - p1.viewY + p1.y - 15, 140 * playersize, 140 * playersize)
+                                        HEIGHT // 2 - p1.viewY + p1.y - 15+70, 140 * playersize, 140 * playersize)
 
 class Run:
     @staticmethod
     def enter(p1,e):
+        p1.m_cnt=0;
         p1.framecnt = 0
         #p1.framex =0
-        p1.mx, p1.my = e[1].x-WIDTH//2 + p1.viewX,  HEIGHT -e[1].y- HEIGHT//2 + p1.viewY+50
+        p1.mx, p1.my = e[1].x-WIDTH//2 + p1.viewX,  HEIGHT -e[1].y- HEIGHT//2 + p1.viewY
         pass
 
     @staticmethod
@@ -93,6 +95,7 @@ class Run:
 
     @staticmethod
     def do(p1):
+        p1.m_cnt+=1
         if p1.framecnt > 4:
             p1.framex = (p1.framex + 1) % 12
             if p1.framex == 0:
@@ -135,16 +138,20 @@ class Run:
 
     @staticmethod
     def draw(p1):
+
+
+        p1.mouse.clip_draw( (p1.m_cnt//4%4)*64 ,64*2,64,64,WIDTH // 2 - p1.viewX + p1.mx, HEIGHT // 2 - p1.viewY + p1.my)
+
         print(p1.x,p1.y)
         size = 112
         playersize = 1.8
         if p1.dire == 0:
             p1.image.clip_composite_draw(p1.framex * size, p1.framey * 133, size, 133
-                                           , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y,
+                                           , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                            200 * playersize, 200 * playersize)
         else:
             p1.image.clip_composite_draw(p1.framex * size, p1.framey * 133, size, 133
-                                           , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y,
+                                           , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                            200 * playersize, 200 * playersize)
         #pass
 
@@ -154,7 +161,7 @@ class Dash:
         p1.framecnt = 0
         p1.framex = 0
         mouse_x,mouse_y = pygame.mouse.get_pos()
-        p1.mx, p1.my = mouse_x - WIDTH // 2 + p1.viewX, HEIGHT - mouse_y - HEIGHT // 2 + p1.viewY + 50
+        p1.mx, p1.my = mouse_x - WIDTH // 2 + p1.viewX, HEIGHT - mouse_y - HEIGHT // 2 + p1.viewY
 
         #p1.mx, p1.my = e[1].x-WIDTH//2 + p1.viewX,  HEIGHT -e[1].y- HEIGHT//2 + p1.viewY+50
 
@@ -210,11 +217,11 @@ class Dash:
         playersize = 1.8
         if p1.dire == 0:
             p1.image.clip_composite_draw((p1.framex + 4) * size, 6 * 133, size, 133
-                                           , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y,
+                                           , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                            200 * playersize, 200 * playersize)
         else:
             p1.image.clip_composite_draw((p1.framex + 4) * size, 6 * 133, size, 133
-                                           , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y,
+                                           , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                            200 * playersize, 200 * playersize)
 
 class Damaged:
@@ -248,11 +255,11 @@ class Damaged:
         playersize = 1.8
         if p1.dire == 0:
             p1.image.clip_composite_draw((p1.framex ) * size, 0, size, 133
-                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y,
+                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                          200 * playersize, 200 * playersize)
         else:
             p1.image.clip_composite_draw((p1.framex) * size, 0, size, 133
-                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y,
+                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                          200 * playersize, 200 * playersize)
 
 class Death:
@@ -280,11 +287,11 @@ class Death:
         p1.image.opacify(p1.framecnt)
         if p1.dire == 0:
             p1.image.clip_composite_draw((p1.framex) * size, 0, size, 133
-                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y,
+                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                          200 * playersize, 200 * playersize)
         else:
             p1.image.clip_composite_draw((p1.framex) * size, 0, size, 133
-                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y,
+                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                          200 * playersize, 200 * playersize)
         pass
 
