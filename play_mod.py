@@ -27,7 +27,6 @@ def handle_events():
         else:
             p1.handle_event(event)
 
-
 def init():
     global key
     global world
@@ -56,8 +55,7 @@ def update():
         o.update(viewX, viewY)
         viewX, viewY = o.viewX, o.viewY
 
-
-def render_world():
+def draw():
     global viewX, viewY
     clear_canvas()
     background.drawback()

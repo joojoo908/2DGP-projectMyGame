@@ -31,3 +31,4 @@ def ck_ground(x, y):
             return 1
 
     return 0
+

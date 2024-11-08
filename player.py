@@ -22,7 +22,6 @@ class Player:
         self.mx,self.my = 0,0
         self.framex = 0
         self.framey = 10
-        #self.state = 0  # 0:idle 1: move  2: dash 3:attack1
         self.dire = 0  # 방향
         self.framecnt = 0
 
