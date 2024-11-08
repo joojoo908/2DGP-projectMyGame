@@ -20,6 +20,8 @@ def dash_over(e):
     return e[0]=='DASH_OVER'
 def death(e):
     return e[0] == 'DEATH'
+def idle(e):
+    return e[0] == 'IDLE'
 def mouse_click(e):
     return e[0] == 'INPUT' and e[1].type == SDL_MOUSEBUTTONDOWN
 

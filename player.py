@@ -33,13 +33,13 @@ class Player:
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
-            Idle: {mouse_click: Run , dash_down:Dash ,damage:Damaged, die:Death},
-            Run: {run_over: Idle ,mouse_click: Run, dash_down:Dash ,damage:Damaged },
-            Dash: {dash_over:Idle,damage:Damaged,dash_down:Dash ,mouse_click: Run},
+            Idle: {mouse_click: Run , dash_down:Dash ,damage:Damaged, die:Death ,attack:Attack},
+            Run: {run_over: Idle ,mouse_click: Run, dash_down:Dash ,damage:Damaged,attack:Attack  },
+            Dash: {dash_over:Idle,damage:Damaged,dash_down:Dash ,mouse_click: Run,attack:Attack},
             Damaged: { mouse_click: Run, dash_down:Dash,damage_over:Idle,
                       death:Death },
             Death: {},
-            Attack1:{}
+            Attack:{idle:Idle}
               })
 
     def handle_event(self ,event):
@@ -54,6 +54,7 @@ class Player:
 class Idle:
     @staticmethod
     def enter(p1, e):
+        p1.framex=0;
         p1.framecnt=0;
         pass
 
@@ -85,7 +86,7 @@ class Run:
     def enter(p1,e):
         p1.m_cnt=0;
         p1.framecnt = 0
-        #p1.framex =0
+        p1.framey = 10
         p1.mx, p1.my = e[1].x-WIDTH//2 + p1.viewX,  HEIGHT -e[1].y- HEIGHT//2 + p1.viewY
         pass
 
@@ -138,8 +139,6 @@ class Run:
 
     @staticmethod
     def draw(p1):
-
-
         p1.mouse.clip_draw( (p1.m_cnt//30%4)*64 ,64*2,64,64,WIDTH // 2 - p1.viewX + p1.mx, HEIGHT // 2 - p1.viewY + p1.my)
 
         #print(p1.x,p1.y)
@@ -296,23 +295,48 @@ class Death:
                                          200 * playersize, 200 * playersize)
         pass
 
-class Attack1:
+class Attack:
     @staticmethod
     def enter(p1, e):
         p1.framecnt = 0
-        p1.framex = 0
-        pass
+        p1.framex = 8
+        p1.framey = 0
+
 
     @staticmethod
     def exit(p1, e):
+        p1.framex = 0
+        p1.framecnt =0
         pass
 
     @staticmethod
     def do(p1):
-        pass
+        if p1.framecnt > p1.maxcnt-10:
+            p1.framex = (p1.framex + 1)%12
+            if p1.framex ==0:
+                p1.framey = (p1.framey + 1)%6
+                if p1.framey ==0:
+                    p1.framex = 8
+                    p1.state_machine.add_event(('IDLE', 0))
+
+
+            p1.framecnt=0
+
+
+        p1.framecnt+=1
+
 
     @staticmethod
     def draw(p1):
-        pass
+        size = 112
+        playersize = 1.8
+        if p1.dire == 0:
+            p1.image.clip_composite_draw((p1.framex ) * size, (6-p1.framey) * 133, size, 133
+                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y + 70,
+                                         200 * playersize, 200 * playersize)
+        else:
+            p1.image.clip_composite_draw((p1.framex ) * size, (6-p1.framey) * 133, size, 133
+                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y + 70,
+                                         200 * playersize, 200 * playersize)
 
 
