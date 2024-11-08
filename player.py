@@ -142,7 +142,7 @@ class Run:
 
         p1.mouse.clip_draw( (p1.m_cnt//4%4)*64 ,64*2,64,64,WIDTH // 2 - p1.viewX + p1.mx, HEIGHT // 2 - p1.viewY + p1.my)
 
-        print(p1.x,p1.y)
+        #print(p1.x,p1.y)
         size = 112
         playersize = 1.8
         if p1.dire == 0:
