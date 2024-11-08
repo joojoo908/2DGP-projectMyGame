@@ -38,7 +38,7 @@ class Ground:
         
     def update(self):
         if self.tiletype==1 or self.tiletype==4:
-            self.framecnt+=1
+            self.framecnt+=0.15
             if self.framecnt>9:
                 self.frame = (self.frame+1)%8
                 self.framecnt =0

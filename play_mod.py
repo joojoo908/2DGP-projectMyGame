@@ -3,6 +3,7 @@ from pico2d import *
 from Ground import Ground
 import game_world
 from player import Player
+import frame_work
 
 WIDTH, HEIGHT = 1400, 1000
 
@@ -21,9 +22,9 @@ def handle_events():
 
     for event in events:
         if event.type == SDL_QUIT:
-            key = 0
+            frame_work.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            key = 0
+            frame_work.quit()
         else:
             p1.handle_event(event)
 

@@ -16,6 +16,7 @@ def angle(x1,y1,x2,y2):
 class Player:
 
     def __init__(self):
+        self.maxcnt = 30;
         self.hp=5
         self.x, self.y = 0, 0
         self.viewX, self.viewY = 0, 0
@@ -32,9 +33,9 @@ class Player:
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
-            Idle: {mouse_click: Run , dash_down:Dash ,damage:Damaged },
+            Idle: {mouse_click: Run , dash_down:Dash ,damage:Damaged, die:Death},
             Run: {run_over: Idle ,mouse_click: Run, dash_down:Dash ,damage:Damaged },
-            Dash: {dash_over:Idle,damage:Damaged,dash_down:Dash },
+            Dash: {dash_over:Idle,damage:Damaged,dash_down:Dash ,mouse_click: Run},
             Damaged: { mouse_click: Run, dash_down:Dash,damage_over:Idle,
                       death:Death },
             Death: {},
@@ -62,7 +63,7 @@ class Idle:
 
     @staticmethod
     def do(p1):
-        if p1.framecnt > 4:
+        if p1.framecnt > p1.maxcnt-5:
             p1.framex = (p1.framex + 1) % 18
             p1.framecnt = 0;
         p1.framecnt += 1
@@ -95,7 +96,7 @@ class Run:
     @staticmethod
     def do(p1):
         p1.m_cnt+=1
-        if p1.framecnt > 4:
+        if p1.framecnt > p1.maxcnt-12:
             p1.framex = (p1.framex + 1) % 12
             if p1.framex == 0:
                 p1.framey = (p1.framey - 1) % 11
@@ -105,7 +106,7 @@ class Run:
             p1.framecnt = 0
         p1.framecnt += 1
 
-        speed=5
+        speed=1
         mx, my = p1.mx,p1.my
         if len(p1.x, p1.y, mx, my) > speed:
             p1.dire = mx <= p1.x  # 플에이어가 바라보는 방향 설정
@@ -139,7 +140,7 @@ class Run:
     def draw(p1):
 
 
-        p1.mouse.clip_draw( (p1.m_cnt//4%4)*64 ,64*2,64,64,WIDTH // 2 - p1.viewX + p1.mx, HEIGHT // 2 - p1.viewY + p1.my)
+        p1.mouse.clip_draw( (p1.m_cnt//30%4)*64 ,64*2,64,64,WIDTH // 2 - p1.viewX + p1.mx, HEIGHT // 2 - p1.viewY + p1.my)
 
         #print(p1.x,p1.y)
         size = 112
@@ -170,7 +171,7 @@ class Dash:
 
     @staticmethod
     def do(p1):
-        if p1.framecnt > 5:
+        if p1.framecnt > p1.maxcnt*1.5:
             p1.framex = (p1.framex + 1)
             if p1.framex > 4:
                 p1.state_machine.add_event(('DASH_OVER', 0))
@@ -178,7 +179,7 @@ class Dash:
             p1.framecnt = 0
         p1.framecnt+=1
 
-        speed = 10
+        speed = 2
         mx, my = p1.mx, p1.my
         if len(p1.x, p1.y, mx, my) > speed:
             p1.dire = mx <= p1.x  # 플에이어가 바라보는 방향 설정
@@ -238,7 +239,7 @@ class Damaged:
 
     @staticmethod
     def do(p1):
-        if p1.framecnt > 3:
+        if p1.framecnt > p1.maxcnt:
             p1.framex = (p1.framex + 1)
             p1.framecnt=0
             if p1.framex>5:
@@ -265,6 +266,7 @@ class Death:
     @staticmethod
     def enter(p1, e):
         p1.framecnt = 0
+        p1.framex = 6
         pass
 
     @staticmethod
@@ -274,8 +276,8 @@ class Death:
 
     @staticmethod
     def do(p1):
-        if p1.framecnt<250:
-            p1.framecnt+=1
+        if p1.framecnt< 250*3:
+            p1.framecnt+= 1
         else:
             pass
 
@@ -283,7 +285,7 @@ class Death:
     def draw(p1):
         size = 112
         playersize = 1.8
-        p1.image.opacify(p1.framecnt)
+        p1.image.opacify(p1.framecnt//3)
         if p1.dire == 0:
             p1.image.clip_composite_draw((p1.framex) * size, 0, size, 133
                                          , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
