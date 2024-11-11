@@ -8,6 +8,7 @@ Time_PER_ACTION =1
 ACTION_PER_TIME =1.0/Time_PER_ACTION
 FRAME_PER_ACTION=18
 FRAME_PER_ACTION_run=24
+FRAME_PER_ACTION_dash=4
 
 import game_world
 from state_machine import *
@@ -170,34 +171,33 @@ class Dash:
 
     @staticmethod
     def do(p1):
-        if p1.framecnt > p1.maxcnt*1.5:
-            p1.framex = (p1.framex + 1)
-            if p1.framex > 4:
-                p1.state_machine.add_event(('DASH_OVER', 0))
-                p1.framex=1
-            p1.framecnt = 0
-        p1.framecnt+=1
+        p1.framex = (p1.framex + FRAME_PER_ACTION_dash*2 * ACTION_PER_TIME * frame_work.frame_time) % 4
+        if p1.framex > 3:
+            p1.state_machine.add_event(('DASH_OVER', 0))
+            p1.framex=0
+
+
 
         speed = 2
         mx, my = p1.mx, p1.my
-        if len(p1.x, p1.y, mx, my) > speed:
+        if len(p1.x, p1.y, mx, my) > RUN_SPEED_PPS * frame_work.frame_time*2:
             p1.dire = mx <= p1.x  # 플에이어가 바라보는 방향 설정
             # 플레이어가 일정 범위 밖일때 맵 전체 이동
             if math.cos(angle(p1.x, p1.y, mx, my)) < 0:
                 if p1.x <= p1.viewX - 400:
-                    p1.viewX += speed * math.cos(angle(p1.x, p1.y, mx, my))
+                    p1.viewX += speed * math.cos(angle(p1.x, p1.y, mx, my))* RUN_SPEED_PPS * frame_work.frame_time
             elif math.cos(angle(p1.x, p1.y, mx, my)) > 0:
                 if p1.x >= p1.viewX + 400:
-                    p1.viewX += speed * math.cos(angle(p1.x, p1.y, mx, my))
+                    p1.viewX += speed * math.cos(angle(p1.x, p1.y, mx, my))* RUN_SPEED_PPS * frame_work.frame_time
             if math.sin(angle(p1.x, p1.y, mx, my)) < 0:
                 if p1.y <= p1.viewY - 200:
-                    p1.viewY += speed * math.sin(angle(p1.x, p1.y, mx, my))
+                    p1.viewY += speed * math.sin(angle(p1.x, p1.y, mx, my))* RUN_SPEED_PPS * frame_work.frame_time
             elif math.sin(angle(p1.x, p1.y, mx, my)) > 0:
-                if p1.y >= p1.viewY + 300:
-                    p1.viewY += speed * math.sin(angle(p1.x, p1.y, mx, my))
+                if p1.y >= p1.viewY + 200:
+                    p1.viewY += speed * math.sin(angle(p1.x, p1.y, mx, my))* RUN_SPEED_PPS * frame_work.frame_time
             # 플레이어 이동
-            movingx = speed * math.cos(angle(p1.x, p1.y, mx, my))
-            movingy = speed * math.sin(angle(p1.x, p1.y, mx, my))
+            movingx = math.cos(angle(p1.x, p1.y, mx, my))* RUN_SPEED_PPS * frame_work.frame_time*2
+            movingy = math.sin(angle(p1.x, p1.y, mx, my))* RUN_SPEED_PPS * frame_work.frame_time*2
 
             if not game_world.ck_ground(p1.x + movingx, p1.y + movingy):
                 p1.x += movingx
@@ -215,11 +215,11 @@ class Dash:
         size = 112
         playersize = 1.8
         if p1.dire == 0:
-            p1.image.clip_composite_draw((p1.framex + 4) * size, 6 * 133, size, 133
+            p1.image.clip_composite_draw((int(p1.framex) + 4) * size, 6 * 133, size, 133
                                            , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                            200 * playersize, 200 * playersize)
         else:
-            p1.image.clip_composite_draw((p1.framex + 4) * size, 6 * 133, size, 133
+            p1.image.clip_composite_draw((int(p1.framex) + 4) * size, 6 * 133, size, 133
                                            , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                            200 * playersize, 200 * playersize)
 
@@ -228,7 +228,6 @@ class Damaged:
     def enter(p1, e):
         p1.framecnt = 0
         p1.framex =0
-        #p1.hp-=1
         print('hp:',p1.hp)
         pass
 
@@ -238,14 +237,12 @@ class Damaged:
 
     @staticmethod
     def do(p1):
-        if p1.framecnt > p1.maxcnt:
-            p1.framex = (p1.framex + 1)
-            p1.framecnt=0
-            if p1.framex>5:
-                if p1.hp <= 0:
-                    p1.state_machine.add_event(('DEATH', 0))
-                p1.state_machine.add_event(('DAMAGE_OVER', 0))
-        p1.framecnt+=1
+        p1.framex = (p1.framex + 6 * ACTION_PER_TIME*2 * frame_work.frame_time) % 6
+        if p1.framex>5.3:
+            if p1.hp <= 0:
+                p1.state_machine.add_event(('DEATH', 0))
+            p1.state_machine.add_event(('DAMAGE_OVER', 0))
+
         pass
 
     @staticmethod
@@ -253,11 +250,11 @@ class Damaged:
         size = 112
         playersize = 1.8
         if p1.dire == 0:
-            p1.image.clip_composite_draw((p1.framex ) * size, 0, size, 133
+            p1.image.clip_composite_draw(int(p1.framex ) * size, 0, size, 133
                                          , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                          200 * playersize, 200 * playersize)
         else:
-            p1.image.clip_composite_draw((p1.framex) * size, 0, size, 133
+            p1.image.clip_composite_draw(int(p1.framex) * size, 0, size, 133
                                          , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                          200 * playersize, 200 * playersize)
 
@@ -265,7 +262,7 @@ class Death:
     @staticmethod
     def enter(p1, e):
         p1.framecnt = 0
-        p1.framex = 6
+
         pass
 
     @staticmethod
@@ -275,22 +272,23 @@ class Death:
 
     @staticmethod
     def do(p1):
-        if p1.framecnt< 250*3:
-            p1.framecnt+= 1
+        if p1.framex< 250:
+            p1.framex = (p1.framex + 100 * ACTION_PER_TIME * frame_work.frame_time)
         else:
+            print('end')
             pass
 
     @staticmethod
     def draw(p1):
         size = 112
         playersize = 1.8
-        p1.image.opacify(p1.framecnt//3)
+        p1.image.opacify( int(p1.framex))
         if p1.dire == 0:
-            p1.image.clip_composite_draw((p1.framex) * size, 0, size, 133
+            p1.image.clip_composite_draw(6 * size, 0, size, 133
                                          , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                          200 * playersize, 200 * playersize)
         else:
-            p1.image.clip_composite_draw((p1.framex) * size, 0, size, 133
+            p1.image.clip_composite_draw(6 * size, 0, size, 133
                                          , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                          200 * playersize, 200 * playersize)
         pass
@@ -331,7 +329,7 @@ class Attack:
         size = 112
         playersize = 1.8
         if p1.dire == 0:
-            p1.image.clip_composite_draw((p1.framex ) * size, (6-p1.framey) * 133, size, 133
+            p1.image.clip_composite_draw((p1.framex) * size, (6-p1.framey) * 133, size, 133
                                          , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y + 70,
                                          200 * playersize, 200 * playersize)
         else:
