@@ -1,10 +1,18 @@
-from pico2d import *
-import math
-import random
+PIXEL_PER_METER =(10.0/0.3)
+RUN_SPEED_KMPH = 50.0
+RUN_SPEED_MPM = (RUN_SPEED_KMPH*1000.0/60.0)
+RUN_SPEED_MPS = (RUN_SPEED_MPM/60.0)
+RUN_SPEED_PPS =(RUN_SPEED_MPS*PIXEL_PER_METER)
+
+Time_PER_ACTION =1
+ACTION_PER_TIME =1.0/Time_PER_ACTION
+FRAME_PER_ACTION=18
+FRAME_PER_ACTION_run=24
 
 import game_world
 from state_machine import *
 import pygame
+import frame_work
 
 WIDTH, HEIGHT = 1400 , 1000
 
@@ -64,20 +72,20 @@ class Idle:
 
     @staticmethod
     def do(p1):
-        if p1.framecnt > p1.maxcnt-5:
-            p1.framex = (p1.framex + 1) % 18
-            p1.framecnt = 0;
-        p1.framecnt += 1
+        #if p1.framecnt > p1.maxcnt-5:
+        p1.framex = (p1.framex + FRAME_PER_ACTION * ACTION_PER_TIME * frame_work.frame_time) % FRAME_PER_ACTION
+        # p1.framecnt = 0;
+        # p1.framecnt += 1
 
     @staticmethod
     def draw(p1):
         playersize = 1.8
         if p1.dire == 0:
-            p1.idle.clip_composite_draw(p1.framex * 80, 0, 80, 80
+            p1.idle.clip_composite_draw(int(p1.framex) * 80, 0, 80, 80
                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x + 15,
                                         HEIGHT // 2 - p1.viewY + p1.y - 15+70, 140 * playersize, 140 * playersize)
         else:
-            p1.idle.clip_composite_draw(p1.framex * 80, 0, 80, 80
+            p1.idle.clip_composite_draw(int(p1.framex) * 80, 0, 80, 80
                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x - 15,
                                         HEIGHT // 2 - p1.viewY + p1.y - 15+70, 140 * playersize, 140 * playersize)
 
@@ -86,7 +94,6 @@ class Run:
     def enter(p1,e):
         p1.m_cnt=0;
         p1.framecnt = 0
-        p1.framey = 10
         p1.mx, p1.my = e[1].x-WIDTH//2 + p1.viewX,  HEIGHT -e[1].y- HEIGHT//2 + p1.viewY
         pass
 
@@ -96,37 +103,30 @@ class Run:
 
     @staticmethod
     def do(p1):
-        p1.m_cnt+=1
-        if p1.framecnt > p1.maxcnt-12:
-            p1.framex = (p1.framex + 1) % 12
-            if p1.framex == 0:
-                p1.framey = (p1.framey - 1) % 11
-                if p1.framey == 8:
-                    p1.framey = 10
-                    p1.framex = 1
-            p1.framecnt = 0
-        p1.framecnt += 1
+        p1.framex = (p1.framex + FRAME_PER_ACTION_run * ACTION_PER_TIME * frame_work.frame_time) %24
 
-        speed=1
+        p1.m_cnt+=1
+
         mx, my = p1.mx,p1.my
-        if len(p1.x, p1.y, mx, my) > speed:
+        if len(p1.x, p1.y, mx, my) > RUN_SPEED_PPS * frame_work.frame_time:
             p1.dire = mx <= p1.x  # 플에이어가 바라보는 방향 설정
             # 플레이어가 일정 범위 밖일때 맵 전체 이동
             if math.cos(angle(p1.x, p1.y, mx, my)) < 0:
                 if p1.x <= p1.viewX - 400:
-                    p1.viewX += speed * math.cos(angle(p1.x, p1.y, mx, my))
+                    p1.viewX += math.cos(angle(p1.x, p1.y, mx, my))* RUN_SPEED_PPS * frame_work.frame_time
             elif math.cos(angle(p1.x, p1.y, mx, my)) > 0:
                 if p1.x >= p1.viewX + 400:
-                    p1.viewX += speed * math.cos(angle(p1.x, p1.y, mx, my))
+                    p1.viewX += math.cos(angle(p1.x, p1.y, mx, my))* RUN_SPEED_PPS * frame_work.frame_time
+
             if math.sin(angle(p1.x, p1.y, mx, my)) < 0:
                 if p1.y <= p1.viewY - 200:
-                    p1.viewY += speed * math.sin(angle(p1.x, p1.y, mx, my))
+                    p1.viewY += math.sin(angle(p1.x, p1.y, mx, my))* RUN_SPEED_PPS * frame_work.frame_time
             elif math.sin(angle(p1.x, p1.y, mx, my)) > 0:
                 if p1.y >= p1.viewY + 300:
-                    p1.viewY += speed * math.sin(angle(p1.x, p1.y, mx, my))
+                    p1.viewY += math.sin(angle(p1.x, p1.y, mx, my))* RUN_SPEED_PPS * frame_work.frame_time
             # 플레이어 이동
-            movingx =speed * math.cos(angle(p1.x, p1.y, mx, my))
-            movingy =speed * math.sin(angle(p1.x, p1.y, mx, my))
+            movingx =math.cos(angle(p1.x, p1.y, mx, my)) * RUN_SPEED_PPS * frame_work.frame_time
+            movingy =math.sin(angle(p1.x, p1.y, mx, my)) * RUN_SPEED_PPS * frame_work.frame_time
 
             if not game_world.ck_ground(p1.x+movingx, p1.y+movingy):
                 p1.x += movingx
@@ -145,11 +145,11 @@ class Run:
         size = 112
         playersize = 1.8
         if p1.dire == 0:
-            p1.image.clip_composite_draw(p1.framex * size, p1.framey * 133, size, 133
+            p1.image.clip_composite_draw(int(p1.framex)%12 * size, (10-int(p1.framex)//12) * 133, size, 133
                                            , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                            200 * playersize, 200 * playersize)
         else:
-            p1.image.clip_composite_draw(p1.framex * size, p1.framey * 133, size, 133
+            p1.image.clip_composite_draw(int(p1.framex)%12 * size, (10-int(p1.framex)//12)  * 133, size, 133
                                            , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
                                            200 * playersize, 200 * playersize)
         #pass
