@@ -29,19 +29,12 @@ def handle_events():
             p1.handle_event(event)
 
 def init():
-    global key
     global world
-    # global grounds
-    global tiles
     global background
     global p1
 
-    key = True
-
     background = Ground(0, 0, 0, 0)
-
     game_world.ground_add()
-    # grounds = load_tiles(file_map)
 
     p1 = Player()
     world.append(p1)
