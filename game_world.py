@@ -60,7 +60,6 @@ def update(viewX, viewY):
         for o in layer:
             o.update(viewX, viewY)
 
-
 def render():
     for layer in world:
         for o in layer:

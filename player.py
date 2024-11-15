@@ -14,6 +14,7 @@ import game_world
 from state_machine import *
 import pygame
 import frame_work
+from skill import *
 
 WIDTH, HEIGHT = 1400 , 1000
 
@@ -42,7 +43,8 @@ class Player:
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
-            Idle: {mouse_click: Run , dash_down:Dash ,damage:Damaged, die:Death ,attack:Attack},
+            Idle: {mouse_click: Run , dash_down:Dash ,damage:Damaged, die:Death ,attack:Attack,
+                   skill:Idle},
             Run: {run_over: Idle ,mouse_click: Run, dash_down:Dash ,damage:Damaged,attack:Attack  },
             Dash: {dash_over:Idle,damage:Damaged,dash_down:Dash ,mouse_click: Run,attack:Attack},
             Damaged: { mouse_click: Run, dash_down:Dash,damage_over:Idle,
@@ -60,6 +62,12 @@ class Player:
     def draw(self):
         self.state_machine.draw()
 
+    def return_xy(self):
+        return self.x,self.y
+
+    def skill(self,num):
+        skill =Skill1(self.x, self.y)
+        game_world.add_object(skill)
 
 class Idle:
     @staticmethod
@@ -70,14 +78,16 @@ class Idle:
 
     @staticmethod
     def exit(p1, e):
+        if skill(e):
+            if(e[1].key==SDLK_1):
+                p1.skill(1)
+
         pass
 
     @staticmethod
     def do(p1):
         #if p1.framecnt > p1.maxcnt-5:
         p1.framex = (p1.framex + FRAME_PER_ACTION * ACTION_PER_TIME * frame_work.frame_time) % FRAME_PER_ACTION
-        # p1.framecnt = 0;
-        # p1.framecnt += 1
 
     @staticmethod
     def draw(p1):

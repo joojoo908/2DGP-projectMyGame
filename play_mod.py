@@ -1,8 +1,10 @@
 from pico2d import *
 
+import monster
 from Ground import Ground
 import game_world
 from player import Player
+from monster import Monster
 import frame_work
 import item_mod
 
@@ -41,6 +43,9 @@ def init():
 
     p1 = Player()
     game_world.add_object(p1,1)
+
+    monster =Monster(50,50,1)
+    game_world.add_object(monster, 1)
 
 def finish():
     pass
