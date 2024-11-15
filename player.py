@@ -60,6 +60,7 @@ class Player:
     def draw(self):
         self.state_machine.draw()
 
+
 class Idle:
     @staticmethod
     def enter(p1, e):
@@ -205,8 +206,6 @@ class Dash:
         else:
             p1.x = mx
             p1.y = my
-
-
 
     @staticmethod
     def draw(p1):

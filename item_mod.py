@@ -15,6 +15,7 @@ def finish():
 
 def draw():
     clear_canvas()
+    game_world.ground_render(play_mod.viewX, play_mod.viewY)
     game_world.render()
     update_canvas()
 
@@ -29,6 +30,8 @@ def handle_events():
         if event.type == SDL_QUIT:
             frame_work.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
+            frame_work.pop_mode()
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_i:
             frame_work.pop_mode()
 
         elif event.type == SDL_KEYDOWN and event.key == SDLK_0:

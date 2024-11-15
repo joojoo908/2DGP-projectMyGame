@@ -4,6 +4,7 @@ from Ground import Ground
 import game_world
 from player import Player
 import frame_work
+import item_mod
 
 WIDTH, HEIGHT = 1400, 1000
 
@@ -25,6 +26,8 @@ def handle_events():
             frame_work.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             frame_work.quit()
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_i:
+            frame_work.push_mode(item_mod)
         else:
             p1.handle_event(event)
 
@@ -33,7 +36,7 @@ def init():
     global background
     global p1
 
-    background = Ground(0, 0, 0, 0)
+    game_world.back_ground_add()
     game_world.ground_add()
 
     p1 = Player()
@@ -51,7 +54,6 @@ def update():
 def draw():
     global viewX, viewY
     clear_canvas()
-    background.drawback()
     game_world.ground_render(viewX, viewY)
     game_world.render()
     update_canvas()
