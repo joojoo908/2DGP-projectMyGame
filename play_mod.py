@@ -37,7 +37,7 @@ def init():
     game_world.ground_add()
 
     p1 = Player()
-    world.append(p1)
+    game_world.add_object(p1,1)
 
 def finish():
     pass
@@ -45,15 +45,19 @@ def finish():
 def update():
     global viewX, viewY
     game_world.ground_update()
-    for o in world:
-        o.update(viewX, viewY)
-        viewX, viewY = o.viewX, o.viewY
+    game_world.update(viewX, viewY)
+    viewX, viewY = p1.viewX, p1.viewY
 
 def draw():
     global viewX, viewY
     clear_canvas()
     background.drawback()
     game_world.ground_render(viewX, viewY)
-    for o in world:
-        o.draw()
+    game_world.render()
     update_canvas()
+
+def pause():
+    pass
+
+def resume():
+    pass
