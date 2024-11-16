@@ -10,13 +10,13 @@ WIDTH, HEIGHT = 1400 , 1000
 class Skill1:
     image = None
 
-    def __init__(self, x = 400, y = 300, velocity = 1):
+    def __init__(self, x = 400, y = 300, vx=0,vy=0):
         self.frame =0
-        self.viewX, self.viewY = 0, 0
+        self.viewX, self.viewY = vx, vy
         self.damage =40
         if Skill1.image == None:
             Skill1.image = load_image('skill/skill_sl.png')
-        self.x, self.y, self.velocity = x, y, velocity
+        self.x, self.y = x, y
 
     def draw(self):
         self.image.clip_composite_draw(int(self.frame)*64, 3*64, 64, 64, 0, 'h',
@@ -45,6 +45,41 @@ class Skill1:
         if group == 'zombie:ball':
             game_world.remove_object(self)
             #print('hit z')
+        pass
+
+class Skill2:
+    image = None
+
+    def __init__(self, x = 400, y = 300, vx=0,vy=0,dire=0):
+        self.frame =0
+        self.viewX, self.viewY = vx, vy
+        self.damage =80
+        if Skill2.image == None:
+            Skill2.image = load_image('skill/B.png')
+        self.x, self.y = x, y
+        self.dire = 1 if dire else -1
+
+    def draw(self):
+        self.image.clip_composite_draw(int(self.frame)*64, 4*64, 64, 64, 0, 'h',
+                WIDTH // 2 - self.viewX + self.x -100*self.dire, HEIGHT // 2 - self.viewY + self.y+120,
+                300 , 500 )
+        draw_rectangle(*self.get_bb())
+
+    def update(self , x,y):
+        self.viewX, self.viewY =x,y
+        self.frame = (self.frame + 10 * ACTION_PER_TIME * frame_work.frame_time)
+
+        if self.frame>10:
+            game_world.remove_object(self)
+
+    def get_bb(self):
+        x = WIDTH // 2 - self.viewX + self.x-100*self.dire
+        y = HEIGHT // 2 - self.viewY + self.y + 120
+        skillsz=200
+        return x - skillsz/2, y - skillsz, x + skillsz/2, y + skillsz
+
+    def handle_collision(self, group, other):
+
         pass
 
 class Mop_atk1:

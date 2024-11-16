@@ -26,15 +26,13 @@ def angle(x1,y1,x2,y2):
 class Player:
 
     def __init__(self):
-        self.maxcnt = 30;
         self.hp=100
         self.x, self.y = 0, 0
         self.viewX, self.viewY = 0, 0
         self.mx,self.my = 0,0
         self.framex = 0
-        self.framey = 10
         self.dire = 1  # 방향
-        self.framecnt = 0
+        self.skillnum = 0
 
         self.image = load_image('red_hood.png')
         self.idle = load_image('red_hood_idle.png')
@@ -44,13 +42,15 @@ class Player:
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
             Idle: {mouse_click: Run , dash_down:Dash ,damage:Damaged, die:Death ,attack:Attack,dmg:Damaged,
-                   skill:Idle},
-            Run: {run_over: Idle ,mouse_click: Run, dash_down:Dash ,damage:Damaged,attack:Attack, dmg:Damaged  },
+                   skill:Skill},
+            Run: {run_over: Idle ,mouse_click: Run, dash_down:Dash ,damage:Damaged,
+                  attack:Attack, dmg:Damaged,skill:Skill  },
             Dash: {dash_over:Idle,damage:Damaged,dash_down:Dash ,mouse_click: Run,attack:Attack,dmg:Damaged},
             Damaged: { mouse_click: Run, dash_down:Dash,damage_over:Idle,
                       death:Death },
             Death: {},
-            Attack:{idle:Idle ,dmg:Damaged}
+            Attack:{idle:Idle ,dmg:Damaged},
+            Skill:{idle:Idle,dmg:Damaged}
               })
 
     def handle_event(self ,event):
@@ -76,9 +76,12 @@ class Player:
         return self.x,self.y
 
     def skill(self,num):
-        skill =Skill1(self.x, self.y)
-        game_world.add_object(skill)
+        if num==1:
+            skill =Skill1(self.x, self.y,self.viewX,self.viewY)
+        elif num == 2:
+            skill = Skill2(self.x, self.y, self.viewX, self.viewY,self.dire)
 
+        game_world.add_object(skill)
         game_world.add_collision_pair('mop:p1_atk', None, skill)
 
     def handle_collision(self, group, other):
@@ -354,6 +357,47 @@ class Attack:
                                          200 * playersize, 200 * playersize)
         else:
             p1.image.clip_composite_draw(int(p1.framex )%12 * size, (6-int(p1.framex)//12) * 133, size, 133
+                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y + 30,
+                                         200 * playersize, 200 * playersize)
+
+class Skill:
+    @staticmethod
+    def enter(p1, e):
+        if skill(e):
+            if (e[1].key == SDLK_1):
+                p1.skillnum=1
+                p1.skill(p1.skillnum)
+                p1.framex = 20
+            if (e[1].key == SDLK_2):
+                p1.skillnum=2
+                p1.framex = 52
+
+    @staticmethod
+    def exit(p1, e):
+        if p1.skillnum==2:
+            p1.skill(p1.skillnum)
+        p1.skillnum=0
+
+    @staticmethod
+    def do(p1):
+        p1.framex = (p1.framex + 68 * ACTION_PER_TIME / 4 * frame_work.frame_time)
+        if p1.skillnum==1:
+            if p1.framex > 20+12:
+                p1.state_machine.add_event(('IDLE', 0))
+        elif p1.skillnum==2:
+            if p1.framex > 52+17:
+                p1.state_machine.add_event(('IDLE', 0))
+
+    @staticmethod
+    def draw(p1):
+        size = 112
+        playersize = 1.8
+        if p1.dire == 0:
+            p1.image.clip_composite_draw(int(p1.framex) % 12 * size, (6 - int(p1.framex) // 12) * 133, size, 133
+                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y + 30,
+                                         200 * playersize, 200 * playersize)
+        else:
+            p1.image.clip_composite_draw(int(p1.framex) % 12 * size, (6 - int(p1.framex) // 12) * 133, size, 133
                                          , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y + 30,
                                          200 * playersize, 200 * playersize)
 

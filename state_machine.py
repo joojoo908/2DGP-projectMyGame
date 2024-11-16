@@ -11,7 +11,8 @@ def die(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key==SDLK_k
 
 def skill(e):
-    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key==SDLK_1
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and (e[1].key==SDLK_1 or
+            e[1].key==SDLK_2)
 
 def time_out(e):
     return e[0]=='TIME_OUT'
