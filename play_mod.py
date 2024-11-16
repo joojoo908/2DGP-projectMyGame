@@ -43,7 +43,7 @@ def init():
     p1 = Player()
     game_world.add_object(p1,1)
 
-    state = State(p1.hp)
+    state = State(p1.hp,p1.mp)
     game_world.add_object(state, 3)
 
     monster =Monster(200,0,1)

@@ -4,8 +4,9 @@ import play_mod
 from pico2d import load_image
 WIDTH, HEIGHT = 1400, 1000
 class State:
-    def __init__(self,hp):
+    def __init__(self,hp,mp):
         self.hp_bar = hp
+        self.mp_bar = mp
         self.cir = load_image('state/Circle.png')
         self.icon = load_image('state/Icon.png')
         self.image = load_image('state/Bar.png')
@@ -27,7 +28,8 @@ class State:
 
 
         self.mp.clip_composite_draw(0, 0, 128, 16
-                , 0, '', 0 + 350 - 37, HEIGHT - 80, 150 * 2.5, 16 * 2)
+                , 0, '', 0 + 350 - 37 -(150 * 2.5/2)*(1- play_mod.p1.mp/self.mp_bar) , HEIGHT - 80,
+                        150 * 2.5*(play_mod.p1.mp/self.mp_bar), 16 * 2)
         self.image.clip_composite_draw(0, 0, 128, 16
                 , 0, '', 0 + 350 - 37, HEIGHT - 80, 150 * 2.5+10, 16 * 2)
 

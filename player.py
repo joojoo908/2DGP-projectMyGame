@@ -27,6 +27,7 @@ class Player:
 
     def __init__(self):
         self.hp=100
+        self.mp=100
         self.x, self.y = 0, 0
         self.viewX, self.viewY = 0, 0
         self.mx,self.my = 0,0
@@ -57,6 +58,7 @@ class Player:
         self.state_machine.add_event(('INPUT', event))
         pass
     def update(self,vx,vy):
+        self.mp+= (3 * ACTION_PER_TIME * frame_work.frame_time)
         self.viewX,self.viewY=vx,vy
         self.state_machine.update()
     def draw(self):
@@ -78,6 +80,7 @@ class Player:
     def skill(self,num):
         if num==1:
             skill =Skill1(self.x, self.y,self.viewX,self.viewY)
+
         elif num == 2:
             skill = Skill2(self.x, self.y, self.viewX, self.viewY,self.dire)
 
@@ -365,12 +368,20 @@ class Skill:
     def enter(p1, e):
         if skill(e):
             if (e[1].key == SDLK_1):
-                p1.skillnum=1
-                p1.skill(p1.skillnum)
-                p1.framex = 20
+                if p1.mp>=20:
+                    p1.mp -= 20
+                    p1.skillnum = 1
+                    p1.skill(p1.skillnum)
+                    p1.framex = 20
+                else:
+                    p1.state_machine.add_event(('IDLE', 0))
             if (e[1].key == SDLK_2):
-                p1.skillnum=2
-                p1.framex = 52
+                if p1.mp>=20:
+                    p1.mp -= 20
+                    p1.skillnum=2
+                    p1.framex = 52
+                else:
+                    p1.state_machine.add_event(('IDLE', 0))
 
     @staticmethod
     def exit(p1, e):
