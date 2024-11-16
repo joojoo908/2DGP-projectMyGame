@@ -27,7 +27,7 @@ class Player:
 
     def __init__(self):
         self.maxcnt = 30;
-        self.hp=5
+        self.hp=100
         self.x, self.y = 0, 0
         self.viewX, self.viewY = 0, 0
         self.mx,self.my = 0,0
@@ -43,14 +43,14 @@ class Player:
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
-            Idle: {mouse_click: Run , dash_down:Dash ,damage:Damaged, die:Death ,attack:Attack,
+            Idle: {mouse_click: Run , dash_down:Dash ,damage:Damaged, die:Death ,attack:Attack,dmg:Damaged,
                    skill:Idle},
-            Run: {run_over: Idle ,mouse_click: Run, dash_down:Dash ,damage:Damaged,attack:Attack  },
-            Dash: {dash_over:Idle,damage:Damaged,dash_down:Dash ,mouse_click: Run,attack:Attack},
+            Run: {run_over: Idle ,mouse_click: Run, dash_down:Dash ,damage:Damaged,attack:Attack, dmg:Damaged  },
+            Dash: {dash_over:Idle,damage:Damaged,dash_down:Dash ,mouse_click: Run,attack:Attack,dmg:Damaged},
             Damaged: { mouse_click: Run, dash_down:Dash,damage_over:Idle,
                       death:Death },
             Death: {},
-            Attack:{idle:Idle}
+            Attack:{idle:Idle ,dmg:Damaged}
               })
 
     def handle_event(self ,event):
@@ -68,7 +68,7 @@ class Player:
             x = WIDTH // 2 - self.viewX + self.x +20
         else:
             x = WIDTH // 2 - self.viewX + self.x - 20
-        y = HEIGHT // 2 - self.viewY + self.y+40
+        y = HEIGHT // 2 - self.viewY + self.y
         skillsz = 50
         return x - skillsz, y - skillsz, x + skillsz, y + skillsz
 
@@ -85,6 +85,8 @@ class Player:
         if group == 'p1:mop':
             pass
         if group == 'p1:mop_atk':
+            self.state_machine.add_event(('DMG', 0))
+            self.hp -=other.damage
             print('dmg')
             pass
 
@@ -114,11 +116,11 @@ class Idle:
         if p1.dire == 0:
             p1.idle.clip_composite_draw(int(p1.framex) * 80, 0, 80, 80
                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x + 15,
-                                        HEIGHT // 2 - p1.viewY + p1.y - 15+70, 140 * playersize, 140 * playersize)
+                                        HEIGHT // 2 - p1.viewY + p1.y - 15+30, 140 * playersize, 140 * playersize)
         else:
             p1.idle.clip_composite_draw(int(p1.framex) * 80, 0, 80, 80
                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x - 15,
-                                        HEIGHT // 2 - p1.viewY + p1.y - 15+70, 140 * playersize, 140 * playersize)
+                                        HEIGHT // 2 - p1.viewY + p1.y - 15+30, 140 * playersize, 140 * playersize)
 
 class Run:
     @staticmethod
@@ -177,11 +179,11 @@ class Run:
         playersize = 1.8
         if p1.dire == 0:
             p1.image.clip_composite_draw(int(p1.framex)%12 * size, (10-int(p1.framex)//12) * 133, size, 133
-                                           , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
+                                           , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+30,
                                            200 * playersize, 200 * playersize)
         else:
             p1.image.clip_composite_draw(int(p1.framex)%12 * size, (10-int(p1.framex)//12)  * 133, size, 133
-                                           , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
+                                           , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+30,
                                            200 * playersize, 200 * playersize)
         #pass
 
@@ -242,11 +244,11 @@ class Dash:
         playersize = 1.8
         if p1.dire == 0:
             p1.image.clip_composite_draw((int(p1.framex) + 4) * size, 6 * 133, size, 133
-                                           , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
+                                           , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+30,
                                            200 * playersize, 200 * playersize)
         else:
             p1.image.clip_composite_draw((int(p1.framex) + 4) * size, 6 * 133, size, 133
-                                           , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
+                                           , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+30,
                                            200 * playersize, 200 * playersize)
 
 class Damaged:
@@ -277,11 +279,11 @@ class Damaged:
         playersize = 1.8
         if p1.dire == 0:
             p1.image.clip_composite_draw(int(p1.framex ) * size, 0, size, 133
-                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
+                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+30,
                                          200 * playersize, 200 * playersize)
         else:
             p1.image.clip_composite_draw(int(p1.framex) * size, 0, size, 133
-                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
+                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+30,
                                          200 * playersize, 200 * playersize)
 
 class Death:
@@ -311,11 +313,11 @@ class Death:
         p1.image.opacify( int(p1.framex))
         if p1.dire == 0:
             p1.image.clip_composite_draw(6 * size, 0, size, 133
-                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
+                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+30,
                                          200 * playersize, 200 * playersize)
         else:
             p1.image.clip_composite_draw(6 * size, 0, size, 133
-                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+70,
+                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y+30,
                                          200 * playersize, 200 * playersize)
         pass
 
@@ -347,11 +349,11 @@ class Attack:
         playersize = 1.8
         if p1.dire == 0:
             p1.image.clip_composite_draw(int(p1.framex)%12 * size, (6-int(p1.framex)//12) * 133, size, 133
-                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y + 70,
+                                         , 0, 'h', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y + 30,
                                          200 * playersize, 200 * playersize)
         else:
             p1.image.clip_composite_draw(int(p1.framex )%12 * size, (6-int(p1.framex)//12) * 133, size, 133
-                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y + 70,
+                                         , 0, 'i', WIDTH // 2 - p1.viewX + p1.x, HEIGHT // 2 - p1.viewY + p1.y + 30,
                                          200 * playersize, 200 * playersize)
 
 

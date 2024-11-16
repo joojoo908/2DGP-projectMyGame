@@ -59,7 +59,7 @@ class Monster:
             if len(x, y, self.x, self.y) > 500:
                 self.atk_mode = 0
                 self.state_machine.add_event(('IDLE', 0))
-            elif len(x, y, self.x, self.y) > 150:
+            elif len(x, y, self.x, self.y) > 140:
                 self.state_machine.add_event(('MOVE', 0))
             else:
                 self.state_machine.add_event(('ATK', 0))
@@ -79,7 +79,7 @@ class Monster:
         draw_rectangle(*self.get_bb())
 
     def attack(self):
-        attack = Mop_atk1(self.x,self.y,1)
+        attack = Mop_atk1(self.x,self.y,self.viewX,self.viewY)
         game_world.add_object(attack)
         game_world.add_collision_pair('p1:mop_atk', None, attack)
 

@@ -1,8 +1,9 @@
 from pico2d import *
 
-import monster
 from Ground import Ground
 import game_world
+
+from player_state import State
 from player import Player
 from monster import Monster
 import frame_work
@@ -41,6 +42,9 @@ def init():
 
     p1 = Player()
     game_world.add_object(p1,1)
+
+    state = State(p1.hp)
+    game_world.add_object(state, 3)
 
     monster =Monster(200,0,1)
     game_world.add_object(monster, 1)
