@@ -33,16 +33,21 @@ def handle_events():
             frame_work.pop_mode()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_i:
             frame_work.pop_mode()
+        elif event.type == SDL_MOUSEBUTTONDOWN:
+            print(event.x,event.y)
+            if 400-50<event.x<500-50 and 300-50<event.y<400-50:
+                play_mod.p1.skills[0]=1
+            elif 700 - 50 < event.x < 800 - 50 and 300 - 50 < event.y < 400 - 50:
+                play_mod.p1.skills[1] = 1
+            elif 1000 - 50 < event.x < 1100 - 50 and 300 - 50 < event.y < 400 - 50:
+                play_mod.p1.skills[2] = 1
+            elif 400 - 50 < event.x < 500 - 50 and 600-50<event.y<700-50:
+                play_mod.p1.skills[3] = 1
+            elif 700 - 50 < event.x < 800 - 50 and 600-50<event.y<700-50:
+                play_mod.p1.skills[4] = 1
+            elif 1000-50<event.x<1100-50 and 600-50<event.y<700-50:
+                play_mod.p1.skills[5]=1
 
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_0:
-            play_mod.boy.set_item ('None')
-            frame_work.pop_mode()
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_1:
-            play_mod.boy.set_item ('Ball')
-            frame_work.pop_mode()
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_2:
-            play_mod.boy.set_item ('BigBall')
-            frame_work.pop_mode()
 
 def pause():
     pass

@@ -34,6 +34,7 @@ class Player:
         self.framex = 0
         self.dire = 1  # 방향
         self.skillnum = 0
+        self.skills=[0,0,0,0,0,0]
 
         self.image = load_image('red_hood.png')
         self.idle = load_image('red_hood_idle.png')
@@ -58,7 +59,8 @@ class Player:
         self.state_machine.add_event(('INPUT', event))
         pass
     def update(self,vx,vy):
-        self.mp+= (3 * ACTION_PER_TIME * frame_work.frame_time)
+        if self.mp<100:
+            self.mp+= (3 * ACTION_PER_TIME * frame_work.frame_time)
         self.viewX,self.viewY=vx,vy
         self.state_machine.update()
     def draw(self):
