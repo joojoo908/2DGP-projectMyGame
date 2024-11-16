@@ -42,13 +42,16 @@ class Monster:
         self.frame = random.randint(0, 7)
         self.dir = 1
         self.atk_mode=0
+        self.death_cnt = 0
 
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
-            Idle: {move: Move ,atk:Atk},
-            Move: {idle:Idle, atk:Atk},
-            Atk: {idle:Idle}
+            Idle: {move: Move ,atk:Atk, dmg:Dmg},
+            Move: {idle:Idle, atk:Atk, dmg:Dmg},
+            Atk: {idle:Idle, dmg:Dmg},
+            Dmg:{idle:Idle,death:Death},
+            Death:{}
         })
 
     def update(self,vx,vy):
@@ -88,7 +91,11 @@ class Monster:
 
     def handle_collision(self, group, other):
         if group == 'mop:p1_atk':
-            print('mop damaged:' ,other.damage)
+            if self.atk_mode!=2:
+                self.atk_mode =2
+                self.state_machine.add_event(('DMG', 0))
+                self.hp -=other.damage
+                print('mop hp: ',self.hp)
 
 class Idle:
     @staticmethod
@@ -191,5 +198,73 @@ class Atk:
                                           HEIGHT // 2 - self.viewY + self.y, mopsize, mopsize)
         else:
             self.atk.clip_composite_draw(int(self.frame) * 150, 0, 150, 150
+                                          , 0, 'h', WIDTH // 2 - self.viewX + self.x,
+                                          HEIGHT // 2 - self.viewY + self.y, mopsize, mopsize)
+
+class Dmg:
+    @staticmethod
+    def enter(self, e):
+        self.frame = 0
+        pass
+
+    @staticmethod
+    def exit(self, e):
+        self.atk_mode=1
+        pass
+
+    @staticmethod
+    def do(self):
+        self.frame = (self.frame + 4 * ACTION_PER_TIME * frame_work.frame_time)
+
+        if self.frame > 4:
+            self.frame = 0
+            if self.hp <= 0:
+                self.state_machine.add_event(('DEATH', 0))
+            self.state_machine.add_event(('IDLE', 0))
+
+    @staticmethod
+    def draw(self):
+        mopsize = 500
+        if self.dir == 1:
+            self.dmg.clip_composite_draw(int(self.frame) * 150, 0, 150, 150
+                                          , 0, 'i', WIDTH // 2 - self.viewX + self.x,
+                                          HEIGHT // 2 - self.viewY + self.y, mopsize, mopsize)
+        else:
+            self.dmg.clip_composite_draw(int(self.frame) * 150, 0, 150, 150
+                                          , 0, 'h', WIDTH // 2 - self.viewX + self.x,
+                                          HEIGHT // 2 - self.viewY + self.y, mopsize, mopsize)
+
+class Death:
+    @staticmethod
+    def enter(self, e):
+        self.frame = 0
+        self.death_cnt = 0
+        pass
+
+    @staticmethod
+    def exit(self, e):
+        pass
+
+    @staticmethod
+    def do(self):
+        if self.frame < 3:
+            self.frame = (self.frame + 4 * ACTION_PER_TIME * frame_work.frame_time)
+        else:
+            if self.death_cnt <250:
+                self.death_cnt = (self.death_cnt + 100 * ACTION_PER_TIME * frame_work.frame_time)
+            else:
+                game_world.remove_object(self)
+
+    @staticmethod
+    def draw(self):
+        mopsize = 500
+        if self.frame > 3:
+            self.death.opacify( int(self.death_cnt) )
+        if self.dir == 1:
+            self.death.clip_composite_draw(int(self.frame) * 150, 0, 150, 150
+                                          , 0, 'i', WIDTH // 2 - self.viewX + self.x,
+                                          HEIGHT // 2 - self.viewY + self.y, mopsize, mopsize)
+        else:
+            self.death.clip_composite_draw(int(self.frame) * 150, 0, 150, 150
                                           , 0, 'h', WIDTH // 2 - self.viewX + self.x,
                                           HEIGHT // 2 - self.viewY + self.y, mopsize, mopsize)

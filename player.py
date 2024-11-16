@@ -343,6 +343,7 @@ class Attack:
             p1.state_machine.add_event(('IDLE', 0))
 
 
+
     @staticmethod
     def draw(p1):
         size = 112

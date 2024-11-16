@@ -13,7 +13,7 @@ class Skill1:
     def __init__(self, x = 400, y = 300, velocity = 1):
         self.frame =0
         self.viewX, self.viewY = 0, 0
-        self.damage =50
+        self.damage =40
         if Skill1.image == None:
             Skill1.image = load_image('skill/skill_sl.png')
         self.x, self.y, self.velocity = x, y, velocity
