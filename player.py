@@ -33,7 +33,7 @@ class Player:
         self.mx,self.my = 0,0
         self.framex = 0
         self.framey = 10
-        self.dire = 0  # 방향
+        self.dire = 1  # 방향
         self.framecnt = 0
 
         self.image = load_image('red_hood.png')
@@ -61,6 +61,16 @@ class Player:
         self.state_machine.update()
     def draw(self):
         self.state_machine.draw()
+        draw_rectangle(*self.get_bb())
+
+    def get_bb(self):
+        if self.dire:
+            x = WIDTH // 2 - self.viewX + self.x +20
+        else:
+            x = WIDTH // 2 - self.viewX + self.x - 20
+        y = HEIGHT // 2 - self.viewY + self.y+40
+        skillsz = 50
+        return x - skillsz, y - skillsz, x + skillsz, y + skillsz
 
     def return_xy(self):
         return self.x,self.y
@@ -68,6 +78,15 @@ class Player:
     def skill(self,num):
         skill =Skill1(self.x, self.y)
         game_world.add_object(skill)
+
+        game_world.add_collision_pair('mop:p1_atk', None, skill)
+
+    def handle_collision(self, group, other):
+        if group == 'p1:mop':
+            pass
+        if group == 'p1:mop_atk':
+            print('dmg')
+            pass
 
 class Idle:
     @staticmethod

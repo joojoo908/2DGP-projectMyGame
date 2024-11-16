@@ -13,6 +13,7 @@ class Skill1:
     def __init__(self, x = 400, y = 300, velocity = 1):
         self.frame =0
         self.viewX, self.viewY = 0, 0
+        self.damage =50
         if Skill1.image == None:
             Skill1.image = load_image('skill/skill_sl.png')
         self.x, self.y, self.velocity = x, y, velocity
@@ -37,8 +38,6 @@ class Skill1:
         skillsz=150
         return x - skillsz, y - skillsz, x + skillsz, y + skillsz
 
-        pass
-
     def handle_collision(self, group, other):
         # fill here
         if group == 'boy:ball':
@@ -47,3 +46,33 @@ class Skill1:
             game_world.remove_object(self)
             #print('hit z')
         pass
+
+class Mop_atk1:
+    image = None
+
+    def __init__(self, x = 400, y = 300, velocity = 1):
+        self.frame =0
+        self.viewX, self.viewY = 0, 0
+        self.damage =50
+        self.x, self.y, self.velocity = x, y, velocity
+
+    def draw(self):
+        draw_rectangle(*self.get_bb())
+
+    def update(self , x,y):
+        self.viewX, self.viewY =x,y
+        #self.frame = (self.frame + 1 * ACTION_PER_TIME * frame_work.frame_time)
+
+        #if self.frame>1:
+        game_world.remove_object(self)
+
+    def get_bb(self):
+        x = WIDTH // 2 - self.viewX + self.x
+        y = HEIGHT // 2 - self.viewY + self.y
+        skillsz=100
+        return x - skillsz, y - skillsz/2, x + skillsz, y + skillsz/2
+
+    def handle_collision(self, group, other):
+        # fill here
+        if group == 'mop:p1_atk':
+            game_world.remove_object(self)

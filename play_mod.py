@@ -18,9 +18,7 @@ world = []
 
 def handle_events():
     global move
-    global key
 
-    key = True
     events = get_events()
 
     for event in events:
@@ -44,8 +42,14 @@ def init():
     p1 = Player()
     game_world.add_object(p1,1)
 
-    monster =Monster(50,50,1)
+    monster =Monster(200,0,1)
     game_world.add_object(monster, 1)
+
+    game_world.add_collision_pair('p1:mop', p1, None)
+    game_world.add_collision_pair('p1:mop', None, monster)
+
+    game_world.add_collision_pair('p1:mop_atk', p1, None)
+    game_world.add_collision_pair('mop:p1_atk', monster, None)
 
 def finish():
     pass
@@ -55,6 +59,8 @@ def update():
     game_world.ground_update()
     game_world.update(viewX, viewY)
     viewX, viewY = p1.viewX, p1.viewY
+
+    game_world.handle_collisions()
 
 def draw():
     global viewX, viewY

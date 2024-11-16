@@ -1,5 +1,7 @@
+from skill import Mop_atk1
+
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
-RUN_SPEED_KMPH = 10.0  # Km / Hour
+RUN_SPEED_KMPH = 20.0  # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
@@ -15,28 +17,56 @@ import frame_work
 import game_world
 import play_mod
 from pico2d import *
+from skill import *
 
-animation_names = ['Walk','Idle','Dead']
+def len(x1,y1,x2,y2):
+    return math.sqrt((x2-x1)**2 + (y2-y1)**2)
+
+def angle(x1,y1,x2,y2):
+    return math.atan2((y2-y1),(x2-x1))
 
 WIDTH, HEIGHT = 1400 , 1000
 
 class Monster:
-
     def __init__(self,x,y,type):
         self.x, self.y = x,y
         self.viewX, self.viewY = 0, 0
         if type == 1:
+            self.hp =100
             self.idle = load_image('Flying_eye/Flight.png')
+            self.move = load_image('Flying_eye/Flight.png')
+            self.atk = load_image('Flying_eye/Attack.png')
+            self.dmg = load_image('Flying_eye/Take_Hit.png')
+            self.death = load_image('Flying_eye/Death.png')
+
         self.frame = random.randint(0, 7)
         self.dir = 1
+        self.atk_mode=0
 
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
+        self.state_machine.set_transitions({
+            Idle: {move: Move ,atk:Atk},
+            Move: {idle:Idle, atk:Atk},
+            Atk: {idle:Idle}
+        })
 
     def update(self,vx,vy):
         self.viewX, self.viewY = vx, vy
         self.state_machine.update()
-        pass
+        x,y = play_mod.p1.return_xy()
+        if self.atk_mode:
+            if len(x, y, self.x, self.y) > 500:
+                self.atk_mode = 0
+                self.state_machine.add_event(('IDLE', 0))
+            elif len(x, y, self.x, self.y) > 150:
+                self.state_machine.add_event(('MOVE', 0))
+            else:
+                self.state_machine.add_event(('ATK', 0))
+
+        else:
+            if len(x,y,self.x,self.y) <500:
+                self.atk_mode = 1
 
     def get_bb(self):
         x = WIDTH // 2 - self.viewX + self.x
@@ -48,15 +78,17 @@ class Monster:
         self.state_machine.draw()
         draw_rectangle(*self.get_bb())
 
+    def attack(self):
+        attack = Mop_atk1(self.x,self.y,1)
+        game_world.add_object(attack)
+        game_world.add_collision_pair('p1:mop_atk', None, attack)
+
     def handle_event(self, event):
         pass
 
     def handle_collision(self, group, other):
-        if group == 'boy:zombie':
-            pass
-        if group == 'zombie:ball':
-            print('hit ball')
-            game_world.remove_object(self)
+        if group == 'mop:p1_atk':
+            print('mop damaged:' ,other.damage)
 
 class Idle:
     @staticmethod
@@ -88,3 +120,76 @@ class Idle:
             self.idle.clip_composite_draw(int(self.frame) * 150, 0, 150, 150
                                         , 0, 'h', WIDTH // 2 - self.viewX + self.x,
                                         HEIGHT // 2 - self.viewY + self.y , mopsize,mopsize)
+
+class Move:
+    @staticmethod
+    def enter(self, e):
+
+        pass
+
+    @staticmethod
+    def exit(self, e):
+        pass
+
+    @staticmethod
+    def do(self):
+        self.frame = (self.frame + FRAME_PER_ACTION * ACTION_PER_TIME * frame_work.frame_time) % FRAME_PER_ACTION
+        x, y = play_mod.p1.return_xy()
+        if x < self.x:
+            self.dir = -1
+        else:
+            self.dir = 1
+
+        movingx = math.cos(angle(self.x, self.y, x, y)) * RUN_SPEED_PPS * frame_work.frame_time
+        movingy = math.sin(angle(self.x, self.y, x, y)) * RUN_SPEED_PPS * frame_work.frame_time
+
+        self.x += movingx
+        self.y += movingy
+
+    @staticmethod
+    def draw(self):
+        mopsize = 500
+        if self.dir == 1:
+            self.move.clip_composite_draw(int(self.frame) * 150, 0, 150, 150
+                                          , 0, 'i', WIDTH // 2 - self.viewX + self.x,
+                                          HEIGHT // 2 - self.viewY + self.y, mopsize, mopsize)
+        else:
+            self.move.clip_composite_draw(int(self.frame) * 150, 0, 150, 150
+                                          , 0, 'h', WIDTH // 2 - self.viewX + self.x,
+                                          HEIGHT // 2 - self.viewY + self.y, mopsize, mopsize)
+
+class Atk:
+    @staticmethod
+    def enter(self, e):
+        self.frame = 0
+        pass
+
+    @staticmethod
+    def exit(self, e):
+        self.attack()
+        pass
+
+    @staticmethod
+    def do(self):
+        self.frame = (self.frame + FRAME_PER_ACTION * ACTION_PER_TIME * frame_work.frame_time)
+        x, y = play_mod.p1.return_xy()
+        if x < self.x:
+            self.dir = -1
+        else:
+            self.dir = 1
+
+        if self.frame > 8:
+            self.frame = 0
+            self.state_machine.add_event(('IDLE', 0))
+
+    @staticmethod
+    def draw(self):
+        mopsize = 500
+        if self.dir == 1:
+            self.atk.clip_composite_draw(int(self.frame) * 150, 0, 150, 150
+                                          , 0, 'i', WIDTH // 2 - self.viewX + self.x,
+                                          HEIGHT // 2 - self.viewY + self.y, mopsize, mopsize)
+        else:
+            self.atk.clip_composite_draw(int(self.frame) * 150, 0, 150, 150
+                                          , 0, 'h', WIDTH // 2 - self.viewX + self.x,
+                                          HEIGHT // 2 - self.viewY + self.y, mopsize, mopsize)
