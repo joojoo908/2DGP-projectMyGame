@@ -1,4 +1,4 @@
-from pico2d import load_image
+from pico2d import load_image ,load_font
 import play_mod
 
 class Pannel:
@@ -7,6 +7,7 @@ class Pannel:
         self.sk1= load_image('state/skill1.png')
         self.sk =load_image('state/skills.png')
         self.sk3 =load_image('state/skill3.png')
+        self.font = load_font('ENCR10B.TTF', 16)
 
     def draw(self):
         self.image.opacify(100)
@@ -32,6 +33,9 @@ class Pannel:
         self.sk.opacify(150 - 140*play_mod.p1.skills[5])
         self.sk.clip_composite_draw(16 * 3, 16 * 1, 16, 16, 0, 'h',
                                     1000, 400, 100, 100)
+
+        self.font.draw(600,200, f'skill point: {play_mod.p1.skillpoint}', (0,0,0))
+
 
     def update(self):
         pass

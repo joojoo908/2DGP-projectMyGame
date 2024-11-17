@@ -34,6 +34,7 @@ class Player:
         self.framex = 0
         self.dire = 1  # 방향
         self.skillnum = 0
+        self.skillpoint=10
         self.skills=[0,0,0,0,0,0]
 
         self.image = load_image('red_hood.png')
