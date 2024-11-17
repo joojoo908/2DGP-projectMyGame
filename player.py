@@ -108,10 +108,6 @@ class Idle:
 
     @staticmethod
     def exit(p1, e):
-        if skill(e):
-            if(e[1].key==SDLK_1):
-                p1.skill(1)
-
         pass
 
     @staticmethod
@@ -371,7 +367,7 @@ class Skill:
     def enter(p1, e):
         if skill(e):
             if (e[1].key == SDLK_1):
-                if p1.mp>=20:
+                if p1.mp>=20 and p1.skills[0]:
                     p1.mp -= 20
                     p1.skillnum = 1
                     p1.skill(p1.skillnum)
@@ -379,7 +375,7 @@ class Skill:
                 else:
                     p1.state_machine.add_event(('IDLE', 0))
             if (e[1].key == SDLK_2):
-                if p1.mp>=20:
+                if p1.mp>=20 and p1.skills[1]:
                     p1.mp -= 20
                     p1.skillnum=2
                     p1.framex = 52
