@@ -82,6 +82,40 @@ class Skill2:
 
         pass
 
+class Skill3:
+    image = None
+
+    def __init__(self, x = 400, y = 300, vx=0,vy=0,dire=0):
+        self.frame =0
+        self.viewX, self.viewY = vx, vy
+        self.damage =0
+        if self.image == None:
+            self.image = load_image('skill/D.png')
+        self.x, self.y = x, y
+        self.dire = 1 if dire else -1
+
+    def draw(self):
+        self.image.clip_composite_draw(int(self.frame)*64, 1920-64*2, 64, 64, 0, 'h',
+                WIDTH // 2 - self.viewX + self.x , HEIGHT // 2 - self.viewY + self.y,
+                300 , 300 )
+
+    def update(self , x,y):
+        self.viewX, self.viewY =x,y
+        self.frame = (self.frame + 10 * ACTION_PER_TIME * frame_work.frame_time)
+
+        if self.frame>10:
+            game_world.remove_object(self)
+
+    def get_bb(self):
+        x = WIDTH // 2 - self.viewX + self.x
+        y = HEIGHT // 2 - self.viewY + self.y
+        skillsz=200
+        return x - skillsz, y - skillsz, x + skillsz, y + skillsz
+
+    def handle_collision(self, group, other):
+
+        pass
+
 class Mop_atk1:
     image = None
 

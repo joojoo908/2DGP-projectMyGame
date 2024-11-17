@@ -60,7 +60,6 @@ def handle_events():
                     play_mod.p1.skillpoint-=2
                     play_mod.p1.skills[5]=1
 
-
 def pause():
     pass
 

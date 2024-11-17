@@ -62,7 +62,7 @@ class Monster:
             if len(x, y, self.x, self.y) > 500:
                 self.atk_mode = 0
                 self.state_machine.add_event(('IDLE', 0))
-            elif len(x, y, self.x, self.y) > 140:
+            elif len(x, y, self.x, self.y) > 130:
                 self.state_machine.add_event(('MOVE', 0))
             else:
                 self.state_machine.add_event(('ATK', 0))
@@ -152,6 +152,8 @@ class Move:
 
         self.x += movingx
         self.y += movingy
+
+
 
     @staticmethod
     def draw(self):

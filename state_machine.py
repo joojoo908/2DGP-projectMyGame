@@ -12,7 +12,8 @@ def die(e):
 
 def skill(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and (e[1].key==SDLK_1 or
-            e[1].key==SDLK_2)
+            e[1].key==SDLK_2 or e[1].key==SDLK_3 or e[1].key==SDLK_4
+                or e[1].key==SDLK_5 or e[1].key==SDLK_6)
 
 def time_out(e):
     return e[0]=='TIME_OUT'

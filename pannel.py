@@ -14,12 +14,18 @@ class Pannel:
         self.image.clip_composite_draw(0, 0, 256, 256, 0, '',
                     700,500 , 1000, 800)
 
+        self.font.draw(300, 580, f'consumption points: 1', (0, 0, 0))
+        self.font.draw(300, 610, f'mana needed: 20', (0, 0, 0))
         self.sk.opacify(150 - 140*play_mod.p1.skills[0] )
         self.sk.clip_composite_draw(16 * 11, 16 * 3, 16, 16, 0, 'h',
                                     400, 700, 100, 100)
+        self.font.draw(600, 580, f'consumption points: 1', (0, 0, 0))
+        self.font.draw(600, 610, f'mana needed: 20', (0, 0, 0))
         self.sk.opacify(150 - 140*play_mod.p1.skills[1])
         self.sk.clip_composite_draw(16*4, 16*1, 16, 16, 0, 'h',
                                     700, 700, 100, 100)
+        self.font.draw(900, 580, f'consumption points: 1', (0, 0, 0))
+        self.font.draw(900, 610, f'mana needed: 10', (0, 0, 0))
         self.sk.opacify(150 - 140*play_mod.p1.skills[2])
         self.sk.clip_composite_draw(16 * 0, 16 * 2, 16, 16, 0, 'h',
                                     1000, 700, 100, 100)

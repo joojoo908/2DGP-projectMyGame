@@ -86,9 +86,12 @@ class Player:
 
         elif num == 2:
             skill = Skill2(self.x, self.y, self.viewX, self.viewY,self.dire)
+        elif num == 3:
+            skill = Skill3(self.x, self.y, self.viewX, self.viewY,self.dire)
 
         game_world.add_object(skill)
-        game_world.add_collision_pair('mop:p1_atk', None, skill)
+        if num != 3:
+            game_world.add_collision_pair('mop:p1_atk', None, skill)
 
     def handle_collision(self, group, other):
         if group == 'p1:mop':
@@ -381,11 +384,21 @@ class Skill:
                     p1.framex = 52
                 else:
                     p1.state_machine.add_event(('IDLE', 0))
+            if (e[1].key == SDLK_3):
+                if p1.mp>=10 and p1.skills[2]:
+                    p1.mp -= 10
+                    p1.skillnum=3
+                    p1.skill(p1.skillnum)
+                else:
+                    p1.state_machine.add_event(('IDLE', 0))
 
     @staticmethod
     def exit(p1, e):
         if p1.skillnum==2:
             p1.skill(p1.skillnum)
+        if p1.skillnum==3:
+            if p1.hp<=90:
+                p1.hp+=10
         p1.skillnum=0
 
     @staticmethod
@@ -397,6 +410,8 @@ class Skill:
         elif p1.skillnum==2:
             if p1.framex > 52+17:
                 p1.state_machine.add_event(('IDLE', 0))
+        elif p1.skillnum==3:
+            p1.state_machine.add_event(('IDLE', 0))
 
     @staticmethod
     def draw(p1):
