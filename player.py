@@ -34,8 +34,9 @@ class Player:
         self.framex = 0
         self.dire = 1  # 방향
         self.skillnum = 0
-        self.skillpoint=10
-        self.skills=[0,0,0,0,0,0]
+        self.skillpoint=8
+        self.skills=[1,1,1,1,1,1]
+        self.invincible=0
 
         self.image = load_image('red_hood.png')
         self.idle = load_image('red_hood_idle.png')
@@ -83,30 +84,35 @@ class Player:
     def skill(self,num):
         if num==1:
             skill =Skill1(self.x, self.y,self.viewX,self.viewY)
-
         elif num == 2:
             skill = Skill2(self.x, self.y, self.viewX, self.viewY,self.dire)
         elif num == 3:
-            skill = Skill3(self.x, self.y, self.viewX, self.viewY,self.dire)
+            skill = Skill3(self.x, self.y, self.viewX, self.viewY)
+        elif num==4:
+            skill =Skill4(self.x, self.y,self.viewX,self.viewY)
+        elif num==5:
+            skill =Skill5(self.x, self.y,self.viewX,self.viewY)
 
         game_world.add_object(skill)
-        if num != 3:
+        if num != 3 and num!=4:
             game_world.add_collision_pair('mop:p1_atk', None, skill)
 
     def handle_collision(self, group, other):
         if group == 'p1:mop':
             pass
         if group == 'p1:mop_atk':
-            self.state_machine.add_event(('DMG', 0))
-            self.hp -=other.damage
-            print('dmg')
+            if self.invincible:
+                pass
+            else:
+                self.state_machine.add_event(('DMG', 0))
+                self.hp -= other.damage
             pass
 
 class Idle:
     @staticmethod
     def enter(p1, e):
-        p1.framex=0;
-        p1.framecnt=0;
+        p1.framex=0
+        p1.framecnt=0
         pass
 
     @staticmethod
@@ -377,18 +383,43 @@ class Skill:
                     p1.framex = 20
                 else:
                     p1.state_machine.add_event(('IDLE', 0))
-            if (e[1].key == SDLK_2):
+            elif (e[1].key == SDLK_2):
                 if p1.mp>=20 and p1.skills[1]:
                     p1.mp -= 20
                     p1.skillnum=2
                     p1.framex = 52
                 else:
                     p1.state_machine.add_event(('IDLE', 0))
-            if (e[1].key == SDLK_3):
-                if p1.mp>=10 and p1.skills[2]:
-                    p1.mp -= 10
+            elif (e[1].key == SDLK_3):
+                if p1.mp>=20 and p1.skills[2]:
+                    p1.mp -= 20
                     p1.skillnum=3
                     p1.skill(p1.skillnum)
+                else:
+                    p1.state_machine.add_event(('IDLE', 0))
+            elif (e[1].key == SDLK_4):
+                if p1.mp >= 40 and p1.skills[3]:
+                    p1.mp -= 40
+                    p1.skillnum = 4
+                    p1.invincible = 1
+                    p1.skill(p1.skillnum)
+                else:
+                    p1.state_machine.add_event(('IDLE', 0))
+            elif (e[1].key == SDLK_5):
+                if p1.mp >= 50 and p1.skills[4]:
+                    p1.mp -= 50
+                    p1.skillnum = 5
+                    p1.framex = 20
+                    for i in range(5):
+                        p1.skill(p1.skillnum)
+
+                else:
+                    p1.state_machine.add_event(('IDLE', 0))
+            elif (e[1].key == SDLK_6):
+                if p1.mp >= 80 and p1.skills[5]:
+                    p1.mp -= 80
+                    p1.skillnum = 6
+                    p1.framex = -24
                 else:
                     p1.state_machine.add_event(('IDLE', 0))
 
@@ -399,6 +430,9 @@ class Skill:
         if p1.skillnum==3:
             if p1.hp<=90:
                 p1.hp+=10
+        if p1.skillnum==6:
+            #p1.skill(p1.skillnum)
+            pass
         p1.skillnum=0
 
     @staticmethod
@@ -412,6 +446,15 @@ class Skill:
                 p1.state_machine.add_event(('IDLE', 0))
         elif p1.skillnum==3:
             p1.state_machine.add_event(('IDLE', 0))
+        elif p1.skillnum==4:
+            p1.state_machine.add_event(('IDLE', 0))
+        elif p1.skillnum==5:
+            if p1.framex > 20+36:
+                p1.state_machine.add_event(('IDLE', 0))
+        elif p1.skillnum==6:
+            if p1.framex > -13:
+                p1.state_machine.add_event(('IDLE', 0))
+
 
     @staticmethod
     def draw(p1):
