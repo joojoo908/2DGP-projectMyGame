@@ -58,7 +58,7 @@ class Monster:
         self.viewX, self.viewY = vx, vy
         self.state_machine.update()
         x,y = play_mod.p1.return_xy()
-        if self.atk_mode:
+        if self.atk_mode and self.atk_mode!=2:
             if len(x, y, self.x, self.y) > 500:
                 self.atk_mode = 0
                 self.state_machine.add_event(('IDLE', 0))
@@ -92,7 +92,7 @@ class Monster:
     def handle_collision(self, group, other):
         if group == 'mop:p1_atk':
             if self.atk_mode!=2:
-                self.atk_mode =2
+                self.atk_mode = 2
                 self.state_machine.add_event(('DMG', 0))
                 self.hp -=other.damage
                 print('mop hp: ',self.hp)

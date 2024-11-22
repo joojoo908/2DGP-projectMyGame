@@ -1,6 +1,12 @@
 Time_PER_ACTION =1
 ACTION_PER_TIME =1.0/Time_PER_ACTION
 
+PIXEL_PER_METER =(10.0/0.3)
+ARROW_SPEED_KMPH = 100.0
+ARROW_SPEED_MPM = (ARROW_SPEED_KMPH*1000.0/60.0)
+ARROW_SPEED_MPS = (ARROW_SPEED_MPM/60.0)
+ARROW_SPEED_PPS =(ARROW_SPEED_MPS*PIXEL_PER_METER)
+
 import random
 from pico2d import *
 import game_world
@@ -200,6 +206,46 @@ class Skill5:
             #print('hit z')
         pass
 
+class Skill6:
+    image = None
+
+    def __init__(self, x = 400, y = 300, vx=0,vy=0,angle=0):
+        self.frame =0
+        self.viewX, self.viewY = vx, vy
+        self.damage =150
+        if self.image == None:
+            self.image = load_image('skill/C.png')
+        self.x, self.y = x, y
+        self.angle = angle
+
+    def draw(self):
+        self.image.clip_composite_draw(int(self.frame)%6*64, 21*64, 64, 64, 3.14+self.angle, 'h',
+                WIDTH // 2 - self.viewX + self.x, HEIGHT // 2 - self.viewY + self.y,
+                200 , 50 )
+        draw_rectangle(*self.get_bb())
+
+    def update(self , x,y):
+        self.viewX, self.viewY =x,y
+        self.x +=math.cos(self.angle) * ARROW_SPEED_PPS * frame_work.frame_time
+        self.y +=math.sin(self.angle) * ARROW_SPEED_PPS * frame_work.frame_time
+        self.frame = (self.frame + 10 * ACTION_PER_TIME * frame_work.frame_time)
+
+        if self.frame>20:
+            game_world.remove_object(self)
+
+    def get_bb(self):
+        x = WIDTH // 2 - self.viewX + self.x
+        y = HEIGHT // 2 - self.viewY + self.y
+        skillsz=50
+        return x - skillsz, y - skillsz, x + skillsz, y + skillsz
+
+    def handle_collision(self, group, other):
+        if group == 'mop:p1_atk':
+            pass
+            #game_world.remove_object(self)
+            #print('atk')
+        pass
+
 class Mop_atk1:
     image = None
 
@@ -229,3 +275,5 @@ class Mop_atk1:
         # fill here
         if group == 'mop:p1_atk':
             game_world.remove_object(self)
+
+

@@ -92,9 +92,20 @@ class Player:
             skill =Skill4(self.x, self.y,self.viewX,self.viewY)
         elif num==5:
             skill =Skill5(self.x, self.y,self.viewX,self.viewY)
+        elif num==6:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            mx ,my =mouse_x - WIDTH // 2 + self.viewX, HEIGHT - mouse_y - HEIGHT // 2 + self.viewY
+            ang = angle(self.x, self.y, mx, my)
+            skill =Skill6(self.x, self.y,self.viewX,self.viewY,ang)
+            skill2 =Skill6(self.x, self.y,self.viewX,self.viewY,ang+3.14/180*15)
+            skill3 =Skill6(self.x, self.y,self.viewX,self.viewY,ang-3.14/180*15)
+            game_world.add_object(skill2)
+            game_world.add_object(skill3)
+            game_world.add_collision_pair('mop:p1_atk', None, skill2)
+            game_world.add_collision_pair('mop:p1_atk', None, skill3)
 
         game_world.add_object(skill)
-        if num != 3 and num!=4:
+        if num != 3 or num!=4:
             game_world.add_collision_pair('mop:p1_atk', None, skill)
 
     def handle_collision(self, group, other):
@@ -412,12 +423,11 @@ class Skill:
                     p1.framex = 20
                     for i in range(5):
                         p1.skill(p1.skillnum)
-
                 else:
                     p1.state_machine.add_event(('IDLE', 0))
             elif (e[1].key == SDLK_6):
-                if p1.mp >= 80 and p1.skills[5]:
-                    p1.mp -= 80
+                if p1.mp >= 70 and p1.skills[5]:
+                    p1.mp -= 70
                     p1.skillnum = 6
                     p1.framex = -24
                 else:
@@ -431,7 +441,7 @@ class Skill:
             if p1.hp<=90:
                 p1.hp+=10
         if p1.skillnum==6:
-            #p1.skill(p1.skillnum)
+            p1.skill(p1.skillnum)
             pass
         p1.skillnum=0
 

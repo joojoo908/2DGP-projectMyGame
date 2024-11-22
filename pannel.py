@@ -38,13 +38,13 @@ class Pannel:
                                     400, 400, 100, 100)
 
         self.font.draw(600, 280, f'consumption points: 2', (0, 0, 0))
-        self.font.draw(600, 310, f'mana needed: 80', (0, 0, 0))
+        self.font.draw(600, 310, f'mana needed: 50', (0, 0, 0))
         self.sk.opacify(150 - 140*play_mod.p1.skills[4])
         self.sk.clip_composite_draw(16 * 2, 16 * 0, 16, 16, 0, 'h',
                                     700, 400, 100, 100)
 
         self.font.draw(900, 280, f'consumption points: 2', (0, 0, 0))
-        self.font.draw(900, 310, f'mana needed: 50', (0, 0, 0))
+        self.font.draw(900, 310, f'mana needed: 70', (0, 0, 0))
         self.sk.opacify(150 - 140*play_mod.p1.skills[5])
         self.sk.clip_composite_draw(16 * 3, 16 * 1, 16, 16, 0, 'h',
                                     1000, 400, 100, 100)
