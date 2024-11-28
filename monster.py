@@ -32,7 +32,14 @@ class Monster:
         self.x, self.y = x,y
         self.viewX, self.viewY = 0, 0
         self.type=type
-        if type == 1:
+        if type == 0:
+            self.hp =500
+            self.idle = load_image('boss/Idle.png')
+            self.move = load_image('boss/Move.png')
+            self.atk = load_image('boss/Attack.png')
+            self.dmg = load_image('boss/Take_Hit.png')
+            self.death = load_image('boss/Death.png')
+        elif type == 1:
             self.hp =100
             self.idle = load_image('Flying_eye/Flight.png')
             self.move = load_image('Flying_eye/Flight.png')
@@ -66,7 +73,20 @@ class Monster:
         self.viewX, self.viewY = vx, vy
         self.state_machine.update()
         x,y = play_mod.p1.return_xy()
-        if self.type==1:
+
+        if self.type==0:
+            if self.atk_mode!=2:
+                if len(x, y, self.x, self.y) > 800:
+                    self.atk_mode = 0
+                    self.state_machine.add_event(('IDLE', 0))
+                elif len(x, y, self.x, self.y) > 130:
+                    self.state_machine.add_event(('MOVE', 0))
+                else:
+                    self.state_machine.add_event(('ATK', 0))
+            else:
+                if len(x,y,self.x,self.y) <800:
+                    self.atk_mode = 1
+        elif self.type==1:
             if self.atk_mode!=2:
                 if len(x, y, self.x, self.y) > 500:
                     self.atk_mode = 0
@@ -94,7 +114,12 @@ class Monster:
     def get_bb(self):
         x = WIDTH // 2 - self.viewX + self.x
         y = HEIGHT // 2 - self.viewY + self.y
-        skillsz = 50
+        if self.type==0:
+            skillsz = 50
+        elif self.type==1:
+            skillsz = 50
+        elif self.type==2:
+            skillsz = 100
         return x - skillsz, y - skillsz, x + skillsz, y + skillsz
 
     def draw(self):
@@ -102,7 +127,9 @@ class Monster:
         draw_rectangle(*self.get_bb())
 
     def attack(self):
-        if self.type==1:
+        if self.type==0:
+            attack = Boss_atk1(self.x,self.y,self.viewX,self.viewY)
+        elif self.type==1:
             attack = Mop_atk1(self.x,self.y,self.viewX,self.viewY)
         elif self.type==2:
             attack = Mop_atk2(self.x, self.y, self.viewX, self.viewY)
@@ -132,7 +159,7 @@ class Idle:
 
     @staticmethod
     def do(self):
-        if self.type==1:
+        if self.type==1 or self.type==0:
             maxframe = 8
         else:
             maxframe = 4
@@ -167,7 +194,7 @@ class Move:
 
     @staticmethod
     def do(self):
-        if self.type==1:
+        if self.type==1 or self.type==0:
             maxframe = 8
         else:
             maxframe = 4

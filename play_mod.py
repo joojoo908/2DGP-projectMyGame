@@ -42,17 +42,17 @@ def init():
 
     p1 = Player()
     game_world.add_object(p1,1)
+    game_world.add_collision_pair('p1:mop', p1, None)
+    game_world.add_collision_pair('p1:mop_atk', p1, None)
 
     state = State(p1.hp,p1.mp)
     game_world.add_object(state, 3)
 
-    monster =Monster(600,0,2)
+
+    #몬스터 소환
+    monster =Monster(600,0,0)
     game_world.add_object(monster, 1)
-
-    game_world.add_collision_pair('p1:mop', p1, None)
     game_world.add_collision_pair('p1:mop', None, monster)
-
-    game_world.add_collision_pair('p1:mop_atk', p1, None)
     game_world.add_collision_pair('mop:p1_atk', monster, None)
 
 def finish():
