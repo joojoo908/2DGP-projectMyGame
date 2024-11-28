@@ -31,6 +31,7 @@ class Monster:
     def __init__(self,x,y,type):
         self.x, self.y = x,y
         self.viewX, self.viewY = 0, 0
+        self.type=type
         if type == 1:
             self.hp =100
             self.idle = load_image('Flying_eye/Flight.png')
@@ -38,6 +39,13 @@ class Monster:
             self.atk = load_image('Flying_eye/Attack.png')
             self.dmg = load_image('Flying_eye/Take_Hit.png')
             self.death = load_image('Flying_eye/Death.png')
+        elif type==2:
+            self.hp = 200
+            self.idle = load_image('Skeleton/Idle.png')
+            self.move = load_image('Skeleton/Walk.png')
+            self.atk = load_image('Skeleton/Attack.png')
+            self.dmg = load_image('Skeleton/Take_Hit.png')
+            self.death = load_image('Skeleton/Death.png')
 
         self.frame = random.randint(0, 7)
         self.dir = 1
@@ -58,18 +66,30 @@ class Monster:
         self.viewX, self.viewY = vx, vy
         self.state_machine.update()
         x,y = play_mod.p1.return_xy()
-        if self.atk_mode and self.atk_mode!=2:
-            if len(x, y, self.x, self.y) > 500:
-                self.atk_mode = 0
-                self.state_machine.add_event(('IDLE', 0))
-            elif len(x, y, self.x, self.y) > 130:
-                self.state_machine.add_event(('MOVE', 0))
+        if self.type==1:
+            if self.atk_mode!=2:
+                if len(x, y, self.x, self.y) > 500:
+                    self.atk_mode = 0
+                    self.state_machine.add_event(('IDLE', 0))
+                elif len(x, y, self.x, self.y) > 130:
+                    self.state_machine.add_event(('MOVE', 0))
+                else:
+                    self.state_machine.add_event(('ATK', 0))
             else:
-                self.state_machine.add_event(('ATK', 0))
-
-        else:
-            if len(x,y,self.x,self.y) <500:
-                self.atk_mode = 1
+                if len(x,y,self.x,self.y) <500:
+                    self.atk_mode = 1
+        elif self.type==2:
+            if self.atk_mode!=2:
+                if len(x, y, self.x, self.y) > 600:
+                    self.atk_mode = 0
+                    self.state_machine.add_event(('IDLE', 0))
+                elif len(x, y, self.x, self.y) > 180:
+                    self.state_machine.add_event(('MOVE', 0))
+                else:
+                    self.state_machine.add_event(('ATK', 0))
+            else:
+                if len(x,y,self.x,self.y) <600:
+                    self.atk_mode = 1
 
     def get_bb(self):
         x = WIDTH // 2 - self.viewX + self.x
@@ -82,7 +102,11 @@ class Monster:
         draw_rectangle(*self.get_bb())
 
     def attack(self):
-        attack = Mop_atk1(self.x,self.y,self.viewX,self.viewY)
+        if self.type==1:
+            attack = Mop_atk1(self.x,self.y,self.viewX,self.viewY)
+        elif self.type==2:
+            attack = Mop_atk2(self.x, self.y, self.viewX, self.viewY)
+
         game_world.add_object(attack)
         game_world.add_collision_pair('p1:mop_atk', None, attack)
 
@@ -94,8 +118,7 @@ class Monster:
             if self.atk_mode!=2:
                 self.atk_mode = 2
                 self.state_machine.add_event(('DMG', 0))
-                self.hp -=other.damage
-                print('mop hp: ',self.hp)
+                self.damage=other.damage
 
 class Idle:
     @staticmethod
@@ -109,7 +132,11 @@ class Idle:
 
     @staticmethod
     def do(self):
-        self.frame = (self.frame + FRAME_PER_ACTION * ACTION_PER_TIME * frame_work.frame_time) % FRAME_PER_ACTION
+        if self.type==1:
+            maxframe = 8
+        else:
+            maxframe = 4
+        self.frame = (self.frame + FRAME_PER_ACTION * ACTION_PER_TIME * frame_work.frame_time) %maxframe
         x ,y=play_mod.p1.return_xy()
         if x<self.x:
             self.dir=-1
@@ -140,15 +167,22 @@ class Move:
 
     @staticmethod
     def do(self):
-        self.frame = (self.frame + FRAME_PER_ACTION * ACTION_PER_TIME * frame_work.frame_time) % FRAME_PER_ACTION
+        if self.type==1:
+            maxframe = 8
+        else:
+            maxframe = 4
+        self.frame = (self.frame + FRAME_PER_ACTION * ACTION_PER_TIME * frame_work.frame_time) % maxframe
         x, y = play_mod.p1.return_xy()
         if x < self.x:
             self.dir = -1
         else:
             self.dir = 1
+        set_speed = 1
+        if self.type==2:
+            set_speed=0.7
 
-        movingx = math.cos(angle(self.x, self.y, x, y)) * RUN_SPEED_PPS * frame_work.frame_time
-        movingy = math.sin(angle(self.x, self.y, x, y)) * RUN_SPEED_PPS * frame_work.frame_time
+        movingx = math.cos(angle(self.x, self.y, x, y)) *set_speed* RUN_SPEED_PPS * frame_work.frame_time
+        movingy = math.sin(angle(self.x, self.y, x, y)) *set_speed* RUN_SPEED_PPS * frame_work.frame_time
 
         self.x += movingx
         self.y += movingy
@@ -212,17 +246,20 @@ class Dmg:
     @staticmethod
     def exit(self, e):
         self.atk_mode=1
+        self.hp -= self.damage
+        print('mop_hp:',self.hp)
+        self.damage=0
         pass
 
     @staticmethod
     def do(self):
         self.frame = (self.frame + 4 * ACTION_PER_TIME * frame_work.frame_time)
-
         if self.frame > 4:
             self.frame = 0
             if self.hp <= 0:
                 self.state_machine.add_event(('DEATH', 0))
-            self.state_machine.add_event(('IDLE', 0))
+            else:
+                self.state_machine.add_event(('IDLE', 0))
 
     @staticmethod
     def draw(self):

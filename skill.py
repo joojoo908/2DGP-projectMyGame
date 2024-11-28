@@ -130,7 +130,7 @@ class Skill4:
     def __init__(self, x = 400, y = 300, vx=0,vy=0):
         self.frame =0
         self.viewX, self.viewY = vx, vy
-        self.damage =40
+        self.damage =0
         if self.image == None:
             self.image = load_image('skill/skill_sl.png')
         self.x, self.y = x, y
@@ -252,7 +252,7 @@ class Mop_atk1:
     def __init__(self, x = 400, y = 300, vx =0,vy =0):
         self.frame =0
         self.viewX, self.viewY = vx,vy
-        self.damage =10
+        self.damage =15
         self.x, self.y = x, y
 
     def draw(self):
@@ -269,6 +269,36 @@ class Mop_atk1:
         x = WIDTH // 2 - self.viewX + self.x
         y = HEIGHT // 2 - self.viewY + self.y
         skillsz=100
+        return x - skillsz, y - skillsz, x + skillsz, y + skillsz
+
+    def handle_collision(self, group, other):
+        # fill here
+        if group == 'mop:p1_atk':
+            game_world.remove_object(self)
+
+class Mop_atk2:
+    image = None
+
+    def __init__(self, x = 400, y = 300, vx =0,vy =0):
+        self.frame =0
+        self.viewX, self.viewY = vx,vy
+        self.damage =20
+        self.x, self.y = x, y
+
+    def draw(self):
+        draw_rectangle(*self.get_bb())
+
+    def update(self , x,y):
+        self.viewX, self.viewY = x,y
+        #self.frame = (self.frame + 1 * ACTION_PER_TIME * frame_work.frame_time)
+
+        #if self.frame>1:
+        game_world.remove_object(self)
+
+    def get_bb(self):
+        x = WIDTH // 2 - self.viewX + self.x
+        y = HEIGHT // 2 - self.viewY + self.y
+        skillsz=200
         return x - skillsz, y - skillsz, x + skillsz, y + skillsz
 
     def handle_collision(self, group, other):

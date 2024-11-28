@@ -46,7 +46,7 @@ def init():
     state = State(p1.hp,p1.mp)
     game_world.add_object(state, 3)
 
-    monster =Monster(600,0,1)
+    monster =Monster(600,0,2)
     game_world.add_object(monster, 1)
 
     game_world.add_collision_pair('p1:mop', p1, None)

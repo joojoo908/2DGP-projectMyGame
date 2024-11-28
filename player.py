@@ -105,7 +105,7 @@ class Player:
             game_world.add_collision_pair('mop:p1_atk', None, skill3)
 
         game_world.add_object(skill)
-        if num != 3 or num!=4:
+        if num != 3 and num!=4:
             game_world.add_collision_pair('mop:p1_atk', None, skill)
 
     def handle_collision(self, group, other):
