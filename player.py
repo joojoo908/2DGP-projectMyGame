@@ -62,7 +62,7 @@ class Player:
         pass
     def update(self,vx,vy):
         if self.mp<100:
-            self.mp+= (3 * ACTION_PER_TIME * frame_work.frame_time)
+            self.mp+= (30 * ACTION_PER_TIME * frame_work.frame_time)
         self.viewX,self.viewY=vx,vy
         self.state_machine.update()
     def draw(self):
