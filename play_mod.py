@@ -51,7 +51,7 @@ def init():
     game_world.add_object(state, 3)
 
     #보스소환
-    boss = Monster(600, 0, 0)
+    boss = Monster(-700, -4200, 0)
     game_world.add_object(boss, 1)
     game_world.add_collision_pair('p1:mop', None, boss)
     game_world.add_collision_pair('mop:p1_atk', boss, None)

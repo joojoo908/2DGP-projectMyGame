@@ -132,6 +132,7 @@ class Idle:
 
     @staticmethod
     def do(p1):
+        print(p1.x,p1.y)
         #if p1.framecnt > p1.maxcnt-5:
         p1.framex = (p1.framex + FRAME_PER_ACTION * ACTION_PER_TIME * frame_work.frame_time) % FRAME_PER_ACTION
 
