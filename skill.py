@@ -15,6 +15,55 @@ import play_mod
 
 WIDTH, HEIGHT = 1400 , 1000
 
+class LV_up:
+    image = None
+
+    def __init__(self, x = 400, y = 300, vx=0,vy=0):
+        self.frame =0
+        self.viewX, self.viewY = vx, vy
+        self.damage =0
+        if self.image == None:
+            self.image = load_image('skill/A.png')
+            self.lvup = load_image('state/LV_up.png')
+        self.x, self.y = x, y
+        self.dire = 1 if play_mod.p1.dire else -1
+
+    def draw(self):
+        self.image.clip_composite_draw(int(self.frame)*64, 7*64, 64, 64, 0, 'h',
+                WIDTH // 2 - self.viewX + self.x , HEIGHT // 2 - self.viewY + self.y-10,
+                200 , 200 )
+        self.lvup.clip_composite_draw(  0* 16, 2 * 16, 16, 16, 0, '',
+                                       WIDTH // 2 - self.viewX + self.x, HEIGHT // 2 - self.viewY + self.y + 100,
+                                       100, 100)
+        # self.image.clip_composite_draw(int(self.frame) * 64, 10 * 64, 64, 64, 0, 'h',
+        #                                WIDTH // 2 - self.viewX + self.x, HEIGHT // 2 - self.viewY + self.y+20,
+        #                                300, 300)
+        #draw_rectangle(*self.get_bb())
+
+    def update(self, x,y):
+        self.viewX, self.viewY = x,y
+        self.x , self.y = play_mod.p1.x +self.dire*10,play_mod.p1.y
+        self.frame = ( self.frame + 10 * ACTION_PER_TIME * frame_work.frame_time)
+
+        if self.frame>8:
+            play_mod.p1.invincible = 0
+            game_world.remove_object(self)
+
+    def get_bb(self):
+        x = WIDTH // 2 - self.viewX + self.x
+        y = HEIGHT // 2 - self.viewY + self.y -20
+        skillsz=100
+        return x - skillsz, y - skillsz, x + skillsz, y + skillsz
+
+    def handle_collision(self, group, other):
+        # fill here
+        if group == 'boy:ball':
+            game_world.remove_object(self)
+        if group == 'zombie:ball':
+            game_world.remove_object(self)
+            #print('hit z')
+        pass
+
 class Skill1:
     image = None
 
@@ -30,7 +79,7 @@ class Skill1:
         self.image.clip_composite_draw(int(self.frame)*64, 3*64, 64, 64, 0, 'h',
                 WIDTH // 2 - self.viewX + self.x, HEIGHT // 2 - self.viewY + self.y+20,
                 500 , 500 )
-        draw_rectangle(*self.get_bb())
+        #draw_rectangle(*self.get_bb())
 
     def update(self , x,y):
         self.viewX, self.viewY =x,y
@@ -71,7 +120,7 @@ class Skill2:
         self.image.clip_composite_draw(int(self.frame)*64, 4*64, 64, 64, 0, 'h',
                 WIDTH // 2 - self.viewX + self.x -100*self.dire, HEIGHT // 2 - self.viewY + self.y+120,
                 300 , 500 )
-        draw_rectangle(*self.get_bb())
+        #draw_rectangle(*self.get_bb())
 
     def update(self , x,y):
         self.viewX, self.viewY =x,y
@@ -222,7 +271,7 @@ class Skill6:
         self.image.clip_composite_draw(int(self.frame)%6*64, 21*64, 64, 64, 3.14+self.angle, 'h',
                 WIDTH // 2 - self.viewX + self.x, HEIGHT // 2 - self.viewY + self.y,
                 200 , 50 )
-        draw_rectangle(*self.get_bb())
+        #draw_rectangle(*self.get_bb())
 
     def update(self , x,y):
         self.viewX, self.viewY =x,y
@@ -256,7 +305,8 @@ class Mop_atk1:
         self.x, self.y = x, y
 
     def draw(self):
-        draw_rectangle(*self.get_bb())
+        pass
+        #draw_rectangle(*self.get_bb())
 
     def update(self , x,y):
         self.viewX, self.viewY = x,y
@@ -286,7 +336,8 @@ class Mop_atk2:
         self.x, self.y = x, y
 
     def draw(self):
-        draw_rectangle(*self.get_bb())
+        pass
+        #draw_rectangle(*self.get_bb())
 
     def update(self , x,y):
         self.viewX, self.viewY = x,y
@@ -316,7 +367,8 @@ class Boss_atk1:
         self.x, self.y = x, y
 
     def draw(self):
-        draw_rectangle(*self.get_bb())
+        pass
+        #draw_rectangle(*self.get_bb())
 
     def update(self , x,y):
         self.viewX, self.viewY = x,y

@@ -26,6 +26,9 @@ def angle(x1,y1,x2,y2):
 class Player:
 
     def __init__(self):
+        self.exp=0
+        self.level=1
+
         self.hp=100
         self.mp=100
         self.x, self.y = 0, 0
@@ -34,9 +37,10 @@ class Player:
         self.framex = 0
         self.dire = 1  # 방향
         self.skillnum = 0
-        self.skillpoint=8
-        self.skills=[1,1,1,1,1,1]
+        self.skillpoint=2
+        self.skills=[1,0,0,0,0,0]
         self.invincible=0
+
 
         self.image = load_image('red_hood.png')
         self.idle = load_image('red_hood_idle.png')
@@ -45,7 +49,7 @@ class Player:
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
-            Idle: {mouse_click: Run , dash_down:Dash ,damage:Damaged, die:Death ,dmg:Damaged,
+            Idle: {mouse_click: Run , dash_down:Dash ,damage:Damaged,dmg:Damaged,
                    skill:Skill},
             Run: {run_over: Idle ,mouse_click: Run, dash_down:Dash ,damage:Damaged,
                    dmg:Damaged,skill:Skill  },
@@ -62,14 +66,26 @@ class Player:
         pass
     def update(self,vx,vy):
         if self.mp<100:
-            self.mp+= (30 * ACTION_PER_TIME * frame_work.frame_time)
+            self.mp+= (10 * ACTION_PER_TIME * frame_work.frame_time)
         #불사모드
-        self.hp=100
+        #self.hp=100
+        print(self.exp)
         self.viewX,self.viewY=vx,vy
         self.state_machine.update()
+
+        if self.exp>=self.level*100:
+            self.exp-=self.level*100
+            self.level+=1
+            self.skillpoint+=1
+            self.hp = 100
+            self.mp = 100
+            skill = LV_up(self.x, self.y, self.viewX, self.viewY)
+            game_world.add_object(skill,0)
+            print('level up')
+
     def draw(self):
         self.state_machine.draw()
-        draw_rectangle(*self.get_bb())
+        #draw_rectangle(*self.get_bb())
 
     def get_bb(self):
         if self.dire:
@@ -134,7 +150,6 @@ class Idle:
 
     @staticmethod
     def do(p1):
-        print(p1.x,p1.y)
         #if p1.framecnt > p1.maxcnt-5:
         p1.framex = (p1.framex + FRAME_PER_ACTION * ACTION_PER_TIME * frame_work.frame_time) % FRAME_PER_ACTION
 

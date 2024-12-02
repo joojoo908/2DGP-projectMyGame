@@ -124,7 +124,7 @@ class Monster:
 
     def draw(self):
         self.state_machine.draw()
-        draw_rectangle(*self.get_bb())
+        #draw_rectangle(*self.get_bb())
 
     def attack(self):
         if self.type==0:
@@ -316,6 +316,8 @@ class Death:
         if self.frame < 3:
             self.frame = (self.frame + 4 * ACTION_PER_TIME * frame_work.frame_time)
         else:
+            if self.death_cnt==0:
+                play_mod.p1.exp += 100
             if self.death_cnt <250:
                 self.death_cnt = (self.death_cnt + 100 * ACTION_PER_TIME * frame_work.frame_time)
             else:

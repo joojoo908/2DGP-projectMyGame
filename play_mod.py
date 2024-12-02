@@ -66,26 +66,26 @@ def init():
     #기본몹들 소환
     monsters = [Monster( -1600 +random.randint(-300, 300),
                         -2500+ random.randint(-300, 300),
-                         random.randint(1, 2))for _ in range(5)]
+                         random.randint(1, 2))for _ in range(3)]
     mops = [Monster(-1300 + random.randint(-500, 500),
              -1300 + random.randint(-500, 500),
-             random.randint(1, 2)) for _ in range(7)]
+             random.randint(1, 2)) for _ in range(5)]
     monsters.extend(mops)
     mops = [Monster(400 + random.randint(-500, 500),
                     -1300 + random.randint(-500, 500),
-                    random.randint(1, 2)) for _ in range(7)]
+                    random.randint(1, 2)) for _ in range(5)]
     monsters.extend(mops)
     mops = [Monster(2000 + random.randint(-1000, 1000),
                     -1800 + random.randint(-200, 200),
-                    random.randint(1, 2)) for _ in range(5)]
+                    random.randint(1, 2)) for _ in range(3)]
     monsters.extend(mops)
     mops = [Monster(3400 + random.randint(-300, 300),
                     -2300 + random.randint(-500, 500),
-                    random.randint(1, 2)) for _ in range(7)]
+                    random.randint(1, 2)) for _ in range(5)]
     monsters.extend(mops)
     mops = [Monster(1200 + random.randint(-1600, 1800),
                     -2700 + random.randint(-200, 200),
-                    random.randint(1, 2)) for _ in range(7)]
+                    random.randint(1, 2)) for _ in range(5)]
     monsters.extend(mops)
     for mop in monsters:
         game_world.add_object(mop, 1)
