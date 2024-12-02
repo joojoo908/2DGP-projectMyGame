@@ -148,9 +148,14 @@ def handle_events():
                 (y + viewY) - (y + viewY) % tilesize - HEIGHT // 2
             )
             if ground:
-                ground.tiletype = tt
-                ground.tilenum = tn
-                print('change')
+                if tt==-1:
+                    if (ground.x, ground.y) in world:
+                        del world[(ground.x, ground.y)]  # 삭제
+                        print('erase')
+                else:
+                    ground.tiletype = tt
+                    ground.tilenum = tn
+                    print('change')
             else:
                 ground = Ground(
                     (x + viewX) - (x + viewX) % tilesize - WIDTH // 2,

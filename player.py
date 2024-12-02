@@ -45,11 +45,11 @@ class Player:
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
-            Idle: {mouse_click: Run , dash_down:Dash ,damage:Damaged, die:Death ,attack:Attack,dmg:Damaged,
+            Idle: {mouse_click: Run , dash_down:Dash ,damage:Damaged, die:Death ,dmg:Damaged,
                    skill:Skill},
             Run: {run_over: Idle ,mouse_click: Run, dash_down:Dash ,damage:Damaged,
-                  attack:Attack, dmg:Damaged,skill:Skill  },
-            Dash: {dash_over:Idle,damage:Damaged,dash_down:Dash ,mouse_click: Run,attack:Attack,dmg:Damaged},
+                   dmg:Damaged,skill:Skill  },
+            Dash: {dash_over:Idle,damage:Damaged,dash_down:Dash ,mouse_click: Run,dmg:Damaged},
             Damaged: { mouse_click: Run, dash_down:Dash,damage_over:Idle,
                       death:Death },
             Death: {},
@@ -63,6 +63,8 @@ class Player:
     def update(self,vx,vy):
         if self.mp<100:
             self.mp+= (30 * ACTION_PER_TIME * frame_work.frame_time)
+        #불사모드
+        self.hp=100
         self.viewX,self.viewY=vx,vy
         self.state_machine.update()
     def draw(self):

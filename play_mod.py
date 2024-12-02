@@ -3,6 +3,7 @@ from pico2d import *
 from Ground import Ground
 import game_world
 
+import random
 from player_state import State
 from player import Player
 from monster import Monster
@@ -61,6 +62,35 @@ def init():
     game_world.add_object(monster, 1)
     game_world.add_collision_pair('p1:mop', None, monster)
     game_world.add_collision_pair('mop:p1_atk', monster, None)
+
+    #기본몹들 소환
+    monsters = [Monster( -1600 +random.randint(-300, 300),
+                        -2500+ random.randint(-300, 300),
+                         random.randint(1, 2))for _ in range(5)]
+    mops = [Monster(-1300 + random.randint(-500, 500),
+             -1300 + random.randint(-500, 500),
+             random.randint(1, 2)) for _ in range(7)]
+    monsters.extend(mops)
+    mops = [Monster(400 + random.randint(-500, 500),
+                    -1300 + random.randint(-500, 500),
+                    random.randint(1, 2)) for _ in range(7)]
+    monsters.extend(mops)
+    mops = [Monster(2000 + random.randint(-1000, 1000),
+                    -1800 + random.randint(-200, 200),
+                    random.randint(1, 2)) for _ in range(5)]
+    monsters.extend(mops)
+    mops = [Monster(3400 + random.randint(-300, 300),
+                    -2300 + random.randint(-500, 500),
+                    random.randint(1, 2)) for _ in range(7)]
+    monsters.extend(mops)
+    mops = [Monster(1200 + random.randint(-1600, 1800),
+                    -2700 + random.randint(-200, 200),
+                    random.randint(1, 2)) for _ in range(7)]
+    monsters.extend(mops)
+    for mop in monsters:
+        game_world.add_object(mop, 1)
+        game_world.add_collision_pair('p1:mop', None, mop)
+        game_world.add_collision_pair('mop:p1_atk', mop, None)
 
 def finish():
     pass
