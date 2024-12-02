@@ -12,6 +12,7 @@ FRAME_PER_ACTION=8
 
 import random
 import math
+import end_mod
 from state_machine import *
 import frame_work
 import game_world
@@ -322,6 +323,7 @@ class Death:
                 self.death_cnt = (self.death_cnt + 100 * ACTION_PER_TIME * frame_work.frame_time)
             else:
                 game_world.remove_object(self)
+                frame_work.change_mode(end_mod)
 
     @staticmethod
     def draw(self):

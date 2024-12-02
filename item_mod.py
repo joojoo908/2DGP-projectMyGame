@@ -36,27 +36,27 @@ def handle_events():
         elif event.type == SDL_MOUSEBUTTONDOWN:
             print(event.x,event.y)
             if 400-50<event.x<500-50 and 300-50<event.y<400-50:
-                if play_mod.p1.skillpoint>1:
+                if play_mod.p1.skillpoint>=1:
                     play_mod.p1.skillpoint-=1
                     play_mod.p1.skills[0]=1
             elif 700 - 50 < event.x < 800 - 50 and 300 - 50 < event.y < 400 - 50:
-                if play_mod.p1.skillpoint>1:
+                if play_mod.p1.skillpoint>=1:
                     play_mod.p1.skillpoint-=1
                     play_mod.p1.skills[1] = 1
             elif 1000 - 50 < event.x < 1100 - 50 and 300 - 50 < event.y < 400 - 50:
-                if play_mod.p1.skillpoint>1:
+                if play_mod.p1.skillpoint>=1:
                     play_mod.p1.skillpoint-=1
                     play_mod.p1.skills[2] = 1
             elif 400 - 50 < event.x < 500 - 50 and 600-50<event.y<700-50:
-                if play_mod.p1.skillpoint>1:
+                if play_mod.p1.skillpoint>=1:
                     play_mod.p1.skillpoint-=1
                     play_mod.p1.skills[3] = 1
             elif 700 - 50 < event.x < 800 - 50 and 600-50<event.y<700-50:
-                if play_mod.p1.skillpoint>2:
+                if play_mod.p1.skillpoint>=2:
                     play_mod.p1.skillpoint-=2
                     play_mod.p1.skills[4] = 1
             elif 1000-50<event.x<1100-50 and 600-50<event.y<700-50:
-                if play_mod.p1.skillpoint>2:
+                if play_mod.p1.skillpoint>=2:
                     play_mod.p1.skillpoint-=2
                     play_mod.p1.skills[5]=1
 

@@ -4,6 +4,8 @@ from Ground import Ground
 import game_world
 
 import random
+
+from game_world import remove_object
 from player_state import State
 from player import Player
 from monster import Monster
@@ -33,6 +35,8 @@ def handle_events():
             frame_work.push_mode(item_mod)
         else:
             p1.handle_event(event)
+
+
 
 def init():
     global world
@@ -92,6 +96,7 @@ def init():
         game_world.add_collision_pair('p1:mop', None, mop)
         game_world.add_collision_pair('mop:p1_atk', mop, None)
 
+
 def finish():
     pass
 
@@ -100,13 +105,7 @@ def update():
     game_world.ground_update()
     game_world.update(viewX, viewY)
     viewX, viewY = p1.viewX, p1.viewY
-
     game_world.handle_collisions()
-    if p1.hp<0:
-        frame_work.push_mode(end_mod)
-    elif boss.hp<0:
-        frame_work.push_mode(end_mod)
-
 def draw():
     global viewX, viewY
     clear_canvas()

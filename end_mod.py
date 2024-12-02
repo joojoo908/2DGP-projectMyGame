@@ -6,13 +6,11 @@ from pygame.examples.cursors import image
 
 def init():
     global image
+    global font
     global logo_start_time
 
-    if play_mod.p1.hp>0:
-        print('clear')
-    else:
-        print('game over')
-    image = load_image('title.png')
+    font = load_font('ENCR10B.TTF', 128)
+    image = load_image('skill_back.png')
 
     logo_start_time=get_time()
 
@@ -31,6 +29,10 @@ def draw():
     clear_canvas()
     image.clip_composite_draw(0,0,800,600,0,'',700,500,
                                            1400,1000)
+    if play_mod.p1.hp>0:
+        font.draw(350, 700, f'Game Clear', (0, 0, 0))
+    else:
+        font.draw(350, 700, f'Game Over', (0, 0, 0))
     update_canvas()
 
 def handle_events():

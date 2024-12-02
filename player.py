@@ -11,6 +11,7 @@ FRAME_PER_ACTION_run=24
 FRAME_PER_ACTION_dash=4
 
 import game_world
+import end_mod
 from state_machine import *
 import pygame
 import frame_work
@@ -69,7 +70,7 @@ class Player:
             self.mp+= (10 * ACTION_PER_TIME * frame_work.frame_time)
         #불사모드
         #self.hp=100
-        print(self.exp)
+        #print(self.exp)
         self.viewX,self.viewY=vx,vy
         self.state_machine.update()
 
@@ -81,7 +82,7 @@ class Player:
             self.mp = 100
             skill = LV_up(self.x, self.y, self.viewX, self.viewY)
             game_world.add_object(skill,0)
-            print('level up')
+            #print('level up')
 
     def draw(self):
         self.state_machine.draw()
@@ -134,7 +135,7 @@ class Player:
                 pass
             else:
                 self.state_machine.add_event(('DMG', 0))
-                self.hp -= other.damage
+                self.damage =other.damage
             pass
 
 class Idle:
@@ -297,6 +298,7 @@ class Dash:
 class Damaged:
     @staticmethod
     def enter(p1, e):
+        p1.hp -= p1.damage
         p1.framecnt = 0
         p1.framex =0
         print('hp:',p1.hp)
@@ -347,6 +349,7 @@ class Death:
             p1.framex = (p1.framex + 100 * ACTION_PER_TIME * frame_work.frame_time)
         else:
             print('end')
+            frame_work.change_mode(end_mod)
             pass
 
     @staticmethod
