@@ -19,6 +19,9 @@ class LV_up:
     image = None
 
     def __init__(self, x = 400, y = 300, vx=0,vy=0):
+        self.sound = load_wav('music/lv_up.mp3')
+        self.sound.set_volume(82)
+        self.sound.play()
         self.frame =0
         self.viewX, self.viewY = vx, vy
         self.damage =0
@@ -68,6 +71,9 @@ class Skill1:
     image = None
 
     def __init__(self, x = 400, y = 300, vx=0,vy=0):
+        self.sound = load_wav('music/sk1.mp3')
+        self.sound.set_volume(70)
+        self.sound.play()
         self.frame =0
         self.viewX, self.viewY = vx, vy
         self.damage =40
@@ -108,6 +114,9 @@ class Skill2:
     image = None
 
     def __init__(self, x = 400, y = 300, vx=0,vy=0,dire=0):
+        self.sound = load_wav('music/sk2.mp3')
+        self.sound.set_volume(82)
+        self.sound.play()
         self.frame =0
         self.viewX, self.viewY = vx, vy
         self.damage =80
@@ -143,6 +152,9 @@ class Skill3:
     image = None
 
     def __init__(self, x = 400, y = 300, vx=0,vy=0):
+        self.sound = load_wav('music/sk3.mp3')
+        self.sound.set_volume(32)
+        self.sound.play()
         self.frame =0
         self.viewX, self.viewY = vx, vy
         self.damage =0
@@ -177,6 +189,9 @@ class Skill4:
     image = None
 
     def __init__(self, x = 400, y = 300, vx=0,vy=0):
+        self.sound = load_wav('music/sk4.mp3')
+        self.sound.set_volume(32)
+        self.sound.play()
         self.frame =0
         self.viewX, self.viewY = vx, vy
         self.damage =0
@@ -218,6 +233,10 @@ class Skill5:
     image = None
 
     def __init__(self, x = 400, y = 300, vx=0,vy=0):
+        self.sound =load_wav('music/sward.mp3')
+        self.sound.set_volume(32)
+        self.sound.play()
+
         self.startframe= 0
         self.frame =self.startframe
         self.viewX, self.viewY = vx ,vy
@@ -233,9 +252,12 @@ class Skill5:
         #draw_rectangle(*self.get_bb())
 
     def update(self , x,y):
+
         self.viewX, self.viewY =x,y
         #self.x += self.velocity * 100 * frame_work.frame_time
         self.frame = (self.frame + 10 * ACTION_PER_TIME * frame_work.frame_time)
+        if self.frame < self.startframe + 20:
+            self.sound.play()
 
         if self.frame>self.startframe+30:
             game_world.remove_object(self)
@@ -259,6 +281,9 @@ class Skill6:
     image = None
 
     def __init__(self, x = 400, y = 300, vx=0,vy=0,angle=0):
+        self.sound = load_wav('music/sk6.mp3')
+        self.sound.set_volume(32)
+        self.sound.play()
         self.frame =0
         self.viewX, self.viewY = vx, vy
         self.damage =150
@@ -277,6 +302,9 @@ class Skill6:
         self.viewX, self.viewY =x,y
         self.x +=math.cos(self.angle) * ARROW_SPEED_PPS * frame_work.frame_time
         self.y +=math.sin(self.angle) * ARROW_SPEED_PPS * frame_work.frame_time
+        if game_world.ck_ground(self.x , self.y ):
+            game_world.remove_object(self)
+
         self.frame = (self.frame + 10 * ACTION_PER_TIME * frame_work.frame_time)
 
         if self.frame>20:
@@ -323,7 +351,7 @@ class Mop_atk1:
 
     def handle_collision(self, group, other):
         # fill here
-        if group == 'mop:p1_atk':
+        if group == 'p1:mop_atk':
             game_world.remove_object(self)
 
 class Mop_atk2:
@@ -354,7 +382,7 @@ class Mop_atk2:
 
     def handle_collision(self, group, other):
         # fill here
-        if group == 'mop:p1_atk':
+        if group == 'p1:mop_atk':
             game_world.remove_object(self)
 
 class Boss_atk1:
@@ -385,5 +413,56 @@ class Boss_atk1:
 
     def handle_collision(self, group, other):
         # fill here
-        if group == 'mop:p1_atk':
+        if group == 'p1:mop_atk':
             game_world.remove_object(self)
+
+class Boss_atk2:
+    image = None
+
+    def __init__(self, x = 400, y = 300, vx=0,vy=0):
+        self.sound =load_wav('music/Boom.mp3')
+        self.sound.set_volume(32)
+        self.sound.play()
+
+        self.startframe= 0
+        self.frame =self.startframe
+        self.viewX, self.viewY = vx ,vy
+        self.damage =0
+        if self.image == None:
+            self.image = load_image('skill/A.png')
+        self.x, self.y = x+ random.randint(-800, 800), y+ random.randint(-800, 800)
+
+    def draw(self):
+        if self.frame<10:
+            self.image.clip_composite_draw(int(self.frame) % 10 * 64, 7 * 64, 64, 64, 0, 'h',
+                WIDTH // 2 - self.viewX + self.x, HEIGHT // 2 - self.viewY + self.y -50,
+                     200, 200)
+        else:
+            self.image.clip_composite_draw(int(self.frame)%10*64, 0*64, 64, 64, 0, 'h',
+                WIDTH // 2 - self.viewX + self.x, HEIGHT // 2 - self.viewY + self.y+20,
+                300 , 300 )
+        #draw_rectangle(*self.get_bb())
+
+    def update(self , x,y):
+        self.viewX, self.viewY =x,y
+        #self.x += self.velocity * 100 * frame_work.frame_time
+        self.frame = (self.frame + 10 * ACTION_PER_TIME * frame_work.frame_time)
+        if self.frame > 10:
+            self.damage = 20
+
+        if self.frame>self.startframe+20:
+            game_world.remove_object(self)
+
+    def get_bb(self):
+        x = WIDTH // 2 - self.viewX + self.x
+        y = HEIGHT // 2 - self.viewY + self.y + 20
+        skillsz=100
+
+        return x - skillsz, y - skillsz, x + skillsz, y + skillsz
+
+    def handle_collision(self, group, other):
+        # fill here
+        if group == 'p1:mop_atk':
+            if self.frame > 10:
+                game_world.remove_object(self)
+            pass

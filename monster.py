@@ -70,12 +70,23 @@ class Monster:
             Death:{}
         })
 
+        self.time = get_time()
+
     def update(self,vx,vy):
         self.viewX, self.viewY = vx, vy
         self.state_machine.update()
         x,y = play_mod.p1.return_xy()
 
         if self.type==0:
+            if self.hp<300:
+                if get_time()-self.time>10:
+                    self.time = get_time()
+                    print('boss time')
+                    for _ in range(10):
+                        attack = Boss_atk2(self.x, self.y, self.viewX, self.viewY)
+                        game_world.add_object(attack)
+                        game_world.add_collision_pair('p1:mop_atk', None, attack)
+
             if self.atk_mode!=2:
                 if len(x, y, self.x, self.y) > 800:
                     self.atk_mode = 0
@@ -129,10 +140,19 @@ class Monster:
 
     def attack(self):
         if self.type==0:
+            self.sound = load_wav('music/boss1.mp3')
+            self.sound.set_volume(42)
+            self.sound.play()
             attack = Boss_atk1(self.x,self.y,self.viewX,self.viewY)
         elif self.type==1:
+            self.sound = load_wav('music/mop1.mp3')
+            self.sound.set_volume(42)
+            self.sound.play()
             attack = Mop_atk1(self.x,self.y,self.viewX,self.viewY)
         elif self.type==2:
+            self.sound = load_wav('music/sward.mp3')
+            self.sound.set_volume(32)
+            self.sound.play()
             attack = Mop_atk2(self.x, self.y, self.viewX, self.viewY)
 
         game_world.add_object(attack)
@@ -212,8 +232,12 @@ class Move:
         movingx = math.cos(angle(self.x, self.y, x, y)) *set_speed* RUN_SPEED_PPS * frame_work.frame_time
         movingy = math.sin(angle(self.x, self.y, x, y)) *set_speed* RUN_SPEED_PPS * frame_work.frame_time
 
-        self.x += movingx
-        self.y += movingy
+        if not game_world.ck_ground(self.x + movingx, self.y + movingy):
+            self.x += movingx
+            self.y += movingy
+
+        # self.x += movingx
+        # self.y += movingy
 
 
 
@@ -233,6 +257,8 @@ class Atk:
     @staticmethod
     def enter(self, e):
         self.frame = 0
+        if self.type==0:
+            self.attack()
         pass
 
     @staticmethod
@@ -268,6 +294,9 @@ class Atk:
 class Dmg:
     @staticmethod
     def enter(self, e):
+        self.sound = load_wav('music/mop_dmg.mp3')
+        self.sound.set_volume(42)
+        self.sound.play()
         self.frame = 0
         pass
 
@@ -322,8 +351,10 @@ class Death:
             if self.death_cnt <250:
                 self.death_cnt = (self.death_cnt + 100 * ACTION_PER_TIME * frame_work.frame_time)
             else:
+                if self.type==0:
+                    play_mod.p1.bgm.set_volume(0)
+                    frame_work.change_mode(end_mod)
                 game_world.remove_object(self)
-                frame_work.change_mode(end_mod)
 
     @staticmethod
     def draw(self):

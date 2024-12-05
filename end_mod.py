@@ -8,9 +8,21 @@ def init():
     global image
     global font
     global logo_start_time
+    global sound
 
     font = load_font('ENCR10B.TTF', 128)
     image = load_image('skill_back.png')
+
+    if play_mod.p1.hp>0:
+        sound = load_wav('music/Game_clear.mp3')
+        sound.set_volume(32)
+        #sound.play()
+    else:
+        sound = load_wav('music/Game_over.mp3')
+        sound.set_volume(32)
+        #sound.play()
+    sound.set_volume(32)
+    sound.play()
 
     logo_start_time=get_time()
 
@@ -19,10 +31,7 @@ def finish():
     del image
 
 def update():
-    # global logo_start_time
-    # if get_time() -logo_start_time >2.0:
-    #     logo_start_time =get_time()
-    #     game_framework.quit()
+    #sound.play()
     pass
 
 def draw():
@@ -43,4 +52,6 @@ def handle_events():
         elif event.type==SDL_KEYDOWN and event.key ==SDLK_ESCAPE:
             frame_work.quit()
         elif event.type==SDL_KEYDOWN:
+            frame_work.quit()
+        elif event.type == SDL_MOUSEBUTTONDOWN:
             frame_work.quit()

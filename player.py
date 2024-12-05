@@ -42,7 +42,6 @@ class Player:
         self.skills=[1,0,0,0,0,0]
         self.invincible=0
 
-
         self.image = load_image('red_hood.png')
         self.idle = load_image('red_hood_idle.png')
         self.mouse = load_image('Mouse.png')
@@ -62,15 +61,17 @@ class Player:
             Skill:{idle:Idle,dmg:Damaged}
               })
 
+        self.bgm = load_music('music/Back_ground.mp3')
+        self.bgm.set_volume(32)
+        self.bgm.repeat_play()
+
     def handle_event(self ,event):
         self.state_machine.add_event(('INPUT', event))
         pass
     def update(self,vx,vy):
         if self.mp<100:
-            self.mp+= (10 * ACTION_PER_TIME * frame_work.frame_time)
-        #불사모드
-        #self.hp=100
-        #print(self.exp)
+            self.mp+= ( (3+self.level) * ACTION_PER_TIME * frame_work.frame_time)
+
         self.viewX,self.viewY=vx,vy
         self.state_machine.update()
 
@@ -134,8 +135,9 @@ class Player:
             if self.invincible:
                 pass
             else:
-                self.state_machine.add_event(('DMG', 0))
-                self.damage =other.damage
+                if other.damage !=0:
+                    self.state_machine.add_event(('DMG', 0))
+                    self.damage =other.damage
             pass
 
 class Idle:
@@ -302,6 +304,9 @@ class Damaged:
         p1.framecnt = 0
         p1.framex =0
         print('hp:',p1.hp)
+        p1.sound = load_wav('music/p1_damaged.mp3')
+        p1.sound.set_volume(52)
+        p1.sound.play()
         pass
 
     @staticmethod
@@ -349,6 +354,7 @@ class Death:
             p1.framex = (p1.framex + 100 * ACTION_PER_TIME * frame_work.frame_time)
         else:
             print('end')
+            p1.bgm.set_volume(0)
             frame_work.change_mode(end_mod)
             pass
 
