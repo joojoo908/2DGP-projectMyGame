@@ -13,7 +13,6 @@ FRAME_PER_ACTION_dash=4
 import game_world
 import end_mod
 from state_machine import *
-import pygame
 import frame_work
 from skill import *
 
@@ -67,6 +66,9 @@ class Player:
 
     def handle_event(self ,event):
         self.state_machine.add_event(('INPUT', event))
+        if event.type ==SDL_MOUSEMOTION:
+            self.mousex,self.mousey =event.x,event.y
+
         pass
     def update(self,vx,vy):
         if self.mp<100:
@@ -88,7 +90,6 @@ class Player:
     def draw(self):
         self.state_machine.draw()
         #draw_rectangle(*self.get_bb())
-
     def get_bb(self):
         if self.dire:
             x = WIDTH // 2 - self.viewX + self.x +20
@@ -113,7 +114,7 @@ class Player:
         elif num==5:
             skill =Skill5(self.x, self.y,self.viewX,self.viewY)
         elif num==6:
-            mouse_x, mouse_y = pygame.mouse.get_pos()
+            mouse_x, mouse_y = self.mousex,self.mousey
             mx ,my =mouse_x - WIDTH // 2 + self.viewX, HEIGHT - mouse_y - HEIGHT // 2 + self.viewY
             ang = angle(self.x, self.y, mx, my)
             skill =Skill6(self.x, self.y,self.viewX,self.viewY,ang)
@@ -171,7 +172,7 @@ class Idle:
 class Run:
     @staticmethod
     def enter(p1,e):
-        p1.m_cnt=0;
+        p1.m_cnt=0
         p1.framecnt = 0
         p1.mx, p1.my = e[1].x-WIDTH//2 + p1.viewX,  HEIGHT -e[1].y- HEIGHT//2 + p1.viewY
         pass
@@ -238,7 +239,7 @@ class Dash:
     def enter(p1, e):
         p1.framecnt = 0
         p1.framex = 0
-        mouse_x,mouse_y = pygame.mouse.get_pos()
+        mouse_x,mouse_y = p1.mousex, p1.mousey
         p1.mx, p1.my = mouse_x - WIDTH // 2 + p1.viewX, HEIGHT - mouse_y - HEIGHT // 2 + p1.viewY
 
         #p1.mx, p1.my = e[1].x-WIDTH//2 + p1.viewX,  HEIGHT -e[1].y- HEIGHT//2 + p1.viewY+50

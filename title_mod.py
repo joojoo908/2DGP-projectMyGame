@@ -1,8 +1,6 @@
 import frame_work
 from pico2d import*
 import play_mod
-from pygame.examples.cursors import image
-
 
 def init():
     global image

@@ -30,6 +30,7 @@ def idle(e):
 def mouse_click(e):
     return e[0] == 'INPUT' and e[1].type == SDL_MOUSEBUTTONDOWN
 
+
 def move(e):
     return e[0] == 'MOVE'
 def atk(e):
